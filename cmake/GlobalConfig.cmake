@@ -114,8 +114,10 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 # Boost
-add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-set(Boost_USE_STATIC_LIBS ON)
+#add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
+#set(Boost_USE_STATIC_LIBS ON)
+add_definitions(-DBOOST_ALL_DYN_LINK) # use shared library
+set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework system filesystem log program_options)
 include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
 link_directories(${Boost_LIBRARY_DIRS})
