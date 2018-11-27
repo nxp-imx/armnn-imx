@@ -254,6 +254,11 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
         find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core-static)
         find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core-static)
 
+        find_library(ARMCOMPUTE_LIBRARY_DEBUG NAMES arm_compute)
+        find_library(ARMCOMPUTE_LIBRARY_RELEASE NAMES arm_compute)
+        find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core)
+        find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core)
+
         set(ARMCOMPUTE_LIBRARIES
             debug ${ARMCOMPUTE_LIBRARY_DEBUG} ${ARMCOMPUTE_CORE_LIBRARY_DEBUG}
             optimized ${ARMCOMPUTE_LIBRARY_RELEASE} ${ARMCOMPUTE_CORE_LIBRARY_RELEASE} )
