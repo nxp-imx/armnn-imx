@@ -251,6 +251,28 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     endif()
 endif()
 
+# ARM Compute NPU backend
+if(ARMCOMPUTEVSINPU)
+    # Add preprocessor definition for ARM Compute NPU
+    add_definitions(-DARMCOMPUTENPU_ENABLED)
+    if(NOT DEFINED ENV{OVXLIB_DIR})
+        message(FATAL_ERROR "please set ENV: OVXLIB_DIR")
+    else()
+        set(OVXLIB_DIR $ENV{OVXLIB_DIR})
+        set(OVXLIB_LIB ${OVXLIB_DIR}/lib)
+    endif()
+
+    if(NOT DEFINED ENV{NNRT_ROOT})
+        message(FATAL_ERROR "please set ENV: NNRT_ROOT")
+    else()
+        set(NNRT_ROOT $ENV{NNRT_ROOT})
+        set(NNRT_LIB ${NNRT_ROOT}/nnrt/lib)
+    endif()
+
+    link_libraries(-L${NNRT_LIB}   -L${OVXLIB_LIB})
+    set(VSINPU_LIBRARIES ovxlib nnrt)
+endif()
+
 # ARM Compute NEON backend
 if(ARMCOMPUTENEON)
     # Add preprocessor definition for ARM Compute NEON
