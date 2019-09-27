@@ -480,7 +480,7 @@ endif()
 if(ARMCOMPUTECL)
     target_link_libraries(armnn ${OPENCL_LIBRARIES})
 endif()
-if(ARMCOMPUTEVSINPU)
+if(VSI_NPU)
     target_link_libraries(armnn ${VSINPU_LIBRARIES})
 endif()
 

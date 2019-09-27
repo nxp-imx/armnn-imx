@@ -252,7 +252,7 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
 endif()
 
 # ARM Compute NPU backend
-if(ARMCOMPUTEVSINPU)
+if(VSI_NPU)
     # Add preprocessor definition for ARM Compute NPU
     add_definitions(-DARMCOMPUTENPU_ENABLED)
     if(NOT DEFINED ENV{OVXLIB_DIR})
