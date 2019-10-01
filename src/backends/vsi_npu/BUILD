@@ -81,7 +81,8 @@ filegroup(
         "test/*.hpp",
         "test/NpuLayerTests.cpp",
         "test/NpuCreateWorkloadTests.cpp",
-        "test/NpuEndToEndTests.cpp"
+        "test/NpuEndToEndTests.cpp",
+        "test/NpuLayerSupportTests.cpp"
     ])
 )
 

@@ -114,14 +114,18 @@ void NpuTensorHandler::getMemoryReady() const {
         }
         m_Memory.reset(new uint8_t[m_TensorInfo.GetNumBytes()]);
         // Keep this track random caculation error issue
-        BOOST_LOG_TRIVIAL(debug) << "allocated memory at" << m_Memory.get() << ", size ="<<m_TensorInfo.GetNumBytes();
+        BOOST_LOG_TRIVIAL(info) << "allocated memory at" << m_Memory.get() << ", size = "<<m_TensorInfo.GetNumBytes();
         return;
     }
 
-    // Rest code for "this" is output handler
+    // Rest code for output handler
     if (m_Memory) {
-        // Execute again: not first time execute our workload
-        assert(m_ModelShell);
+        // "Warn-Start NN execution"
+        if (!m_ModelShell) {
+            assert(false);
+            BOOST_LOG_TRIVIAL(debug) << "Model prepare failed: check previous log for error log";
+            return;
+        }
         BOOST_LOG_TRIVIAL(info) << "Warn-Start NN execution" ;
         m_ModelShell->Execute();
         return;

@@ -571,19 +571,51 @@ bool NpuLayerSupport::IsDebugSupported(const TensorInfo& input,
         reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
 
-bool NpuLayerSupport::IsDepthwiseConvolutionSupported(
-    const TensorInfo& input,
-    const TensorInfo& output,
-    const DepthwiseConvolution2dDescriptor& descriptor,
-    const TensorInfo& weights,
-    const Optional<TensorInfo>& biases,
-    Optional<std::string&> reasonIfUnsupported) const {
-    ignore_unused(output);
+bool NpuLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
+                                                      const TensorInfo& output,
+                                                      const DepthwiseConvolution2dDescriptor& descriptor,
+                                                      const TensorInfo& weights,
+                                                      const Optional<TensorInfo>& biases,
+                                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+
+    // Define supported types.
+    std::array<DataType,2> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Npu DepthwiseConvolution2d: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Npu DepthwiseConvolution2d: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+                                  "Npu DepthwiseConvolution2d: weights is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Npu DepthwiseConvolution2d: input and output types mismatched.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
+                                  "Npu DepthwiseConvolution2d: input and weights types mismatched.");
+
+    if (biases.has_value())
+    {
+        std::array<DataType,2> biasesSupportedTypes =
+        {
+            DataType::Float32,
+            DataType::Signed32
+        };
+        supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
+                                      "Npu DepthwiseConvolution2d: biases is not a supported type.");
+    }
     ignore_unused(descriptor);
-    ignore_unused(weights);
-    ignore_unused(biases);
-    return IsSupportedForDataTypeRef(
-        reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
+
+    return supported;
+
 }
 
 bool NpuLayerSupport::IsDequantizeSupported(const TensorInfo& input,

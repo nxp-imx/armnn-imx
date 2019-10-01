@@ -243,7 +243,7 @@ void ModelShell::Execute() {
 
     if (0 != errCode){
         assert(false);
-        VSILOGE("Start Compute returen error =%d", errCode);
+        VSILOGE("Start Compute return error =%d", errCode);
     }else {
         event->wait();
     }
