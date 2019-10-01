@@ -1,6 +1,7 @@
 #/****************************************************************************
 #*
 #*    Copyright (c) 2019 Vivante Corporation
+#*    Copyright NXP 2019
 #*
 #*    Permission is hereby granted, free of charge, to any person obtaining a
 #*    copy of this software and associated documentation files (the "Software"),
@@ -23,6 +24,12 @@
 #*****************************************************************************/
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
-message("Vsi npu backend is enabled")
-list(APPEND armnnLibraries armnnNpuBackend armnnNpuBackendWorkloads)
-list(APPEND armnnUnitTestLibraries armnnNpuBackendUnitTests)
+list(APPEND armnnLibraries armnnNpuBackend)
+
+if(VSI_NPU)
+    message("VSI NPU backend is enabled")
+    list(APPEND armnnLibraries armnnNpuBackendWorkloads)
+    list(APPEND armnnUnitTestLibraries armnnNpuBackendUnitTests)
+else()
+    message("VSI NPU backend is disabled")
+endif()

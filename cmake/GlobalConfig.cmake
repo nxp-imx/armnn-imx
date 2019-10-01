@@ -254,12 +254,13 @@ endif()
 # ARM Compute NPU backend
 if(VSI_NPU)
     # Add preprocessor definition for ARM Compute NPU
-    add_definitions(-DARMCOMPUTENPU_ENABLED)
+    add_definitions(-DVSI_NPU_ENABLED)
     if(NOT DEFINED ENV{OVXLIB_DIR})
         message(FATAL_ERROR "please set ENV: OVXLIB_DIR")
     else()
         set(OVXLIB_DIR $ENV{OVXLIB_DIR})
         set(OVXLIB_LIB ${OVXLIB_DIR}/lib)
+        set(OVXLIB_INCLUDE ${OVXLIB_DIR}/include)
     endif()
 
     if(NOT DEFINED ENV{NNRT_ROOT})
@@ -267,9 +268,17 @@ if(VSI_NPU)
     else()
         set(NNRT_ROOT $ENV{NNRT_ROOT})
         set(NNRT_LIB ${NNRT_ROOT}/nnrt/lib)
+        set(NNRT_INCLUDE ${NNRT_ROOT} ${NNRT_ROOT}/nnrt)
     endif()
 
-    link_libraries(-L${NNRT_LIB}   -L${OVXLIB_LIB})
+    if(NOT DEFINED ENV{OVX_DRIVER_INCLUDE})
+        message(FATAL_ERROR "please set ENV: OVX_DRIVER_INCLUDE")
+    else()
+        set(OVX_DRIVER_INCLUDE $ENV{OVX_DRIVER_INCLUDE})
+    endif()
+    
+    include_directories(${OVX_DRIVER_INCLUDE} ${NNRT_INCLUDE} ${OVXLIB_INCLUDE})
+    link_libraries(-L${NNRT_LIB} -L${OVXLIB_LIB})
     set(VSINPU_LIBRARIES ovxlib nnrt)
 endif()
 
