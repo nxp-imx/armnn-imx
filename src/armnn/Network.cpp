@@ -285,7 +285,8 @@ OptimizationResult AssignBackends(OptimizedNetwork* optNetObjPtr,
             armnn::LayerType layerType = layer->GetType();
             if (!backendSettings.IsCpuRefUsed() && (layerType == armnn::LayerType::MemCopy ||
                                                     layerType == armnn::LayerType::Constant ||
-                                                    layerType == armnn::LayerType::Permute))
+                                                    layerType == armnn::LayerType::Permute ||
+                                                    layerType == armnn::LayerType::Output))
             {
                 BackendId cpuBackendId(armnn::Compute::CpuRef);
                 layer->SetBackendId(cpuBackendId);
