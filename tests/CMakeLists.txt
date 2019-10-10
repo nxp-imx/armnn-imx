@@ -378,3 +378,8 @@ if(BUILD_ARMNN_QUANTIZER)
     add_executable_ex(ImageCSVFileGenerator ${ImageCSVFileGenerator_sources})
     ImageTensorExecutor(ImageCSVFileGenerator)
 endif()
+
+if (BUILD_VSI_TESTS)
+    add_subdirectory(VSI)
+endif()
+
