@@ -66,5 +66,6 @@ class NpuPadWorkload : public TNpuWorkload<PadQueueDescriptor, DataTypes...> {
     std::vector<int32_t> m_PadDims;
 };
 using NpuPadFloat32Workload = NpuPadWorkload<armnn::DataType::Float32>;
+using NpuPadFloat16Workload = NpuPadWorkload<armnn::DataType::Float16>;
 using NpuPadUint8Workload = NpuPadWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

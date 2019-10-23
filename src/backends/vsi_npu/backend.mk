@@ -38,8 +38,6 @@ BACKEND_SOURCES := \
 BACKEND_TEST_SOURCES := \
         test/NpuCreateWorkloadTests.cpp \
         test/NpuEndToEndTests.cpp \
-        test/NpuJsonPrinterTests.cpp \
         test/NpuLayerSupportTests.cpp \
         test/NpuLayerTests.cpp \
-        test/NpuOptimizedNetworkTests.cpp \
         test/NpuRuntimeTests.cpp

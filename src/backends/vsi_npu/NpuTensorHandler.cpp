@@ -85,11 +85,7 @@ void* NpuTensorHandler::Map(bool blocking)
 const void* NpuTensorHandler::Map(bool blocking) const
 {
     getMemoryReady();
-    if (m_ReadOnlyMem) {
-        return m_ReadOnlyMem;
-    } else {
-        return static_cast<const void*>(m_Memory.get());
-    }
+    return static_cast<const void*>(m_Memory.get());
 }
 
 void* NpuTensorHandler::GetMemArea()
@@ -109,16 +105,13 @@ void NpuTensorHandler::getMemoryReady() const {
     // If InputHandle already allocated memory: means it allocated by previous sub-graph allocated on our backend.
     // In this case, we should not be here because we didn't ask memory allocation internally.
     if (IsInputTensor) {
-        if (m_ReadOnlyMem) {
-            return;
-        }
         m_Memory.reset(new uint8_t[m_TensorInfo.GetNumBytes()]);
         // Keep this track random caculation error issue
         BOOST_LOG_TRIVIAL(info) << "allocated memory at" << m_Memory.get() << ", size = "<<m_TensorInfo.GetNumBytes();
         return;
     }
 
-    // Rest code for output handler
+    // For middle tensor handler
     if (m_Memory) {
         // "Warn-Start NN execution"
         if (!m_ModelShell) {
@@ -127,6 +120,26 @@ void NpuTensorHandler::getMemoryReady() const {
             return;
         }
         BOOST_LOG_TRIVIAL(info) << "Warn-Start NN execution" ;
+        m_ModelShell->Execute();
+        return;
+    }
+
+    // Rest code for output handler
+    if (m_ExternalMem) {
+        // "Warn-Start NN execution"
+        if (!m_ModelShell) {
+            auto mergedModel = adaption::utils::MergeModels(m_ModelStack);
+            m_ModelShell.reset(new ModelShell(std::move(mergedModel)));
+            if (!m_ModelShell) {
+                assert(false);
+                BOOST_LOG_TRIVIAL(debug)
+                    << "Model prepare failed: check previous log for error log";
+                return;
+            }
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "Warn-Start NN execution" ;
+
         m_ModelShell->Execute();
         return;
     }
@@ -167,7 +180,7 @@ MemorySourceFlags NpuTensorHandler::GetImportFlags() const {
 bool NpuTensorHandler::Import(void* memory, MemorySource source) {
     if ((static_cast<MemorySourceFlags>(source) &
         static_cast<MemorySourceFlags>(MemorySource::Malloc)) != 0) {
-        SetMemoryAddr(memory, GetTensorInfo().GetNumBytes());
+        m_ExternalMem = memory;
         return true;
     } else {
         return false;

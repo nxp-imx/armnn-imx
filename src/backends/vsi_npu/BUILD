@@ -71,7 +71,9 @@ cc_binary(
     linkstatic = False,
     copts = ['-std=c++1z'],
     srcs = ["@armnn//:sample"],
-    deps = ["armnn_ovx_backend"],
+    deps = ["armnn_ovx_backend"] +
+           ["@boost//:boost_filesystem"] +
+           ["@boost//:boost_system"],
     linkopts = ["-lpthread"],
 )
 

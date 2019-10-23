@@ -111,5 +111,6 @@ class NpuNormalizationWorkload : public TNpuWorkload<NormalizationQueueDescripto
     DataLayout m_DataLayout;
 };
 using NpuNormalizationFloat32Workload = NpuNormalizationWorkload<armnn::DataType::Float32>;
+using NpuNormalizationFloat16Workload = NpuNormalizationWorkload<armnn::DataType::Float16>;
 using NpuNormalizationUint8Workload = NpuNormalizationWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

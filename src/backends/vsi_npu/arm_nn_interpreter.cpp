@@ -116,10 +116,10 @@ static void convert2DPadding(int32_t* padding, size_t size, int32_t* front, int3
     }
 }
 
-NnApiInterpreter::NnApiInterpreter() {
+Armnn_Interpreter::Armnn_Interpreter() {
 #define REGISTER_OP(NAME)                                                   \
     do {                                                                    \
-        op_container_[OperationType::NAME] = &NnApiInterpreter::map_##NAME; \
+        op_container_[OperationType::NAME] = &Armnn_Interpreter::map_##NAME; \
     } while (0)
 
     REGISTER_OP(ADD);
@@ -171,15 +171,16 @@ NnApiInterpreter::NnApiInterpreter() {
     REGISTER_OP(RSQRT);
     REGISTER_OP(PRELU);
     REGISTER_OP(DECONV_2D);
+    REGISTER_OP(DATA_CONVERT);
 
 /*customer Op*/
 // REGISTER_OP(VSI_RESIZE_NEAREST);
 #undef REGISTER_OP
 }
 
-NnApiInterpreter::~NnApiInterpreter() {}
+Armnn_Interpreter::~Armnn_Interpreter() {}
 
-int NnApiInterpreter::run(Model* model, bool* modified) {
+int Armnn_Interpreter::run(Model* model, bool* modified) {
     *modified = false;
     const std::map<uint32_t, OperationPtr>& operations = model->operations();
     for (auto it = operations.begin(); it != operations.end(); ++it) {
@@ -219,7 +220,7 @@ some operations may not support dynamic configure.",
     return NNA_ERROR_CODE(NO_ERROR);
 }
 
-void NnApiInterpreter::replaceOperation(Model* model,
+void Armnn_Interpreter::replaceOperation(Model* model,
                                         uint32_t op_index,
                                         OperationPtr new_operation) {
     OperationPtr org_operation = model->operation(op_index);
@@ -233,7 +234,7 @@ void NnApiInterpreter::replaceOperation(Model* model,
     model->operations()[op_index] = new_operation;
 }
 
-FusedType NnApiInterpreter::mapFusedType(int fused_code) {
+FusedType Armnn_Interpreter::mapFusedType(int fused_code) {
     FusedType type = FusedType::NONE;
     switch (fused_code) {
         case ANEURALNETWORKS_FUSED_RELU:
@@ -251,7 +252,7 @@ FusedType NnApiInterpreter::mapFusedType(int fused_code) {
     return type;
 }
 
-PadType NnApiInterpreter::mapPadType(int code) {
+PadType Armnn_Interpreter::mapPadType(int code) {
     PadType type = PadType::AUTO;
     switch (code) {
         case ANEURALNETWORKS_PADDING_SAME:
@@ -268,7 +269,7 @@ PadType NnApiInterpreter::mapPadType(int code) {
     return type;
 }
 
-LshProjectionType NnApiInterpreter::mapLshProjectionType(int value) {
+LshProjectionType Armnn_Interpreter::mapLshProjectionType(int value) {
     LshProjectionType type = LshProjectionType::SPARSE;
     switch (value) {
         case 1:
@@ -284,7 +285,7 @@ LshProjectionType NnApiInterpreter::mapLshProjectionType(int value) {
     return type;
 }
 
-FusedType NnApiInterpreter::mapLstmActivationType(int value) {
+FusedType Armnn_Interpreter::mapLstmActivationType(int value) {
     FusedType type = FusedType::NONE;
     switch (value) {
         case 0:
@@ -309,7 +310,7 @@ FusedType NnApiInterpreter::mapLstmActivationType(int value) {
     return type;
 }
 
-std::vector<uint32_t> NnApiInterpreter::reorderOperands(std::vector<uint32_t>& operands,
+std::vector<uint32_t> Armnn_Interpreter::reorderOperands(std::vector<uint32_t>& operands,
                                                         std::vector<int> order) {
     std::vector<uint32_t> new_operands(operands.size());
     new_operands = operands;
@@ -323,7 +324,7 @@ std::vector<uint32_t> NnApiInterpreter::reorderOperands(std::vector<uint32_t>& o
     return new_operands;
 }
 
-std::vector<int32_t> NnApiInterpreter::convertAxes(int32_t* axes_buffer,
+std::vector<int32_t> Armnn_Interpreter::convertAxes(int32_t* axes_buffer,
                                                    size_t length,
                                                    size_t dim_num) {
     std::vector<int32_t> axes;
@@ -331,7 +332,7 @@ std::vector<int32_t> NnApiInterpreter::convertAxes(int32_t* axes_buffer,
     return convertAxes(axes, dim_num);
 }
 
-std::vector<int32_t> NnApiInterpreter::convertAxes(std::vector<int32_t>& axes, size_t dim_num) {
+std::vector<int32_t> Armnn_Interpreter::convertAxes(std::vector<int32_t>& axes, size_t dim_num) {
     std::vector<int32_t> new_axes(axes.size());
     size_t max_size = axes.size() - 1;
     for (size_t i = 0; i < axes.size(); i++) {
@@ -340,7 +341,7 @@ std::vector<int32_t> NnApiInterpreter::convertAxes(std::vector<int32_t>& axes, s
     return new_axes;
 }
 
-void NnApiInterpreter::fillIntArray(Model* model,
+void Armnn_Interpreter::fillIntArray(Model* model,
                                     OperationPtr operation,
                                     std::vector<int32_t>& array,
                                     int32_t op_index,
@@ -359,7 +360,7 @@ void NnApiInterpreter::fillIntArray(Model* model,
     }
 }
 
-int32_t NnApiInterpreter::reverseMask(int32_t mask, size_t dim_num) {
+int32_t Armnn_Interpreter::reverseMask(int32_t mask, size_t dim_num) {
     auto get_bit_in_mask = [](int mask, int index) -> int { return (((int)0x1) << index) & mask; };
     int32_t new_mask = 0;
     for (int i = (int)dim_num - 1; i >= 0; --i) {
@@ -368,7 +369,7 @@ int32_t NnApiInterpreter::reverseMask(int32_t mask, size_t dim_num) {
     return new_mask;
 }
 
-void NnApiInterpreter::truncateOperationIOs(Model* model,
+void Armnn_Interpreter::truncateOperationIOs(Model* model,
                                             OperationPtr operation,
                                             int32_t input_num,
                                             int32_t output_num) {
@@ -386,13 +387,13 @@ void NnApiInterpreter::truncateOperationIOs(Model* model,
 }
 
 #define DECLARE_SAMPLE_OP(NAME, INPUT_NUM, OUTPUT_NUM, OPERATION_TYPE)    \
-    OperationPtr NnApiInterpreter::map_##NAME(                            \
+    OperationPtr Armnn_Interpreter::map_##NAME(                            \
         Model* model, OperationPtr operation, uint32_t operation_index) { \
         NNAPI_CHECK_IO_NUM(operation, INPUT_NUM, OUTPUT_NUM);             \
         return std::make_shared<OPERATION_TYPE>();                        \
     }
 
-OperationPtr NnApiInterpreter::map_ADD(Model* model,
+OperationPtr Armnn_Interpreter::map_ADD(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -400,7 +401,7 @@ OperationPtr NnApiInterpreter::map_ADD(Model* model,
     return std::make_shared<AddOperation>();
 }
 
-OperationPtr NnApiInterpreter::map_SUB(Model* model,
+OperationPtr Armnn_Interpreter::map_SUB(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -408,7 +409,7 @@ OperationPtr NnApiInterpreter::map_SUB(Model* model,
     return std::make_shared<SubOperation>();
 }
 
-OperationPtr NnApiInterpreter::map_DIV(Model* model,
+OperationPtr Armnn_Interpreter::map_DIV(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -418,7 +419,7 @@ OperationPtr NnApiInterpreter::map_DIV(Model* model,
     return std::dynamic_pointer_cast<Operation>(div);
 }
 
-OperationPtr NnApiInterpreter::map_CONCATENATION(Model* model,
+OperationPtr Armnn_Interpreter::map_CONCATENATION(Model* model,
                                                  OperationPtr operation,
                                                  uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, -1, 1);
@@ -430,7 +431,7 @@ OperationPtr NnApiInterpreter::map_CONCATENATION(Model* model,
     return std::dynamic_pointer_cast<Operation>(concat);
 }
 
-OperationPtr NnApiInterpreter::map_CONV_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_CONV_2D(Model* model,
                                            OperationPtr operation,
                                            uint32_t operation_index) {
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
@@ -460,7 +461,7 @@ OperationPtr NnApiInterpreter::map_CONV_2D(Model* model,
     return std::dynamic_pointer_cast<Operation>(conv2d);
 }
 
-OperationPtr NnApiInterpreter::map_DECONV_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_DECONV_2D(Model* model,
                                              OperationPtr operation,
                                              uint32_t operation_index) {
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
@@ -479,7 +480,7 @@ OperationPtr NnApiInterpreter::map_DECONV_2D(Model* model,
     return std::dynamic_pointer_cast<Operation>(deconv2d);
 }
 
-OperationPtr NnApiInterpreter::map_DEPTHWISE_CONV_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_DEPTHWISE_CONV_2D(Model* model,
                                                      OperationPtr operation,
                                                      uint32_t operation_index) {
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
@@ -507,14 +508,14 @@ OperationPtr NnApiInterpreter::map_DEPTHWISE_CONV_2D(Model* model,
     return std::dynamic_pointer_cast<Operation>(conv2d);
 }
 
-OperationPtr NnApiInterpreter::map_RELU(Model* model,
+OperationPtr Armnn_Interpreter::map_RELU(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 1, 1);
     return std::make_shared<ReluOperation>();
 }
 
-OperationPtr NnApiInterpreter::map_FULLY_CONNECTED(Model* model,
+OperationPtr Armnn_Interpreter::map_FULLY_CONNECTED(Model* model,
                                                    OperationPtr operation,
                                                    uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 4, 1);
@@ -532,7 +533,7 @@ OperationPtr NnApiInterpreter::map_FULLY_CONNECTED(Model* model,
     return std::dynamic_pointer_cast<Operation>(fc);
 }
 
-OperationPtr NnApiInterpreter::map_RESHAPE(Model* model,
+OperationPtr Armnn_Interpreter::map_RESHAPE(Model* model,
                                            OperationPtr operation,
                                            uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -551,7 +552,7 @@ OperationPtr NnApiInterpreter::map_RESHAPE(Model* model,
     return std::dynamic_pointer_cast<Operation>(reshape);
 }
 
-OperationPtr NnApiInterpreter::map_SOFTMAX(Model* model,
+OperationPtr Armnn_Interpreter::map_SOFTMAX(Model* model,
                                            OperationPtr operation,
                                            uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -564,7 +565,7 @@ OperationPtr NnApiInterpreter::map_SOFTMAX(Model* model,
     return std::dynamic_pointer_cast<Operation>(softmax);
 }
 
-OperationPtr NnApiInterpreter::map_TRANSPOSE(Model* model,
+OperationPtr Armnn_Interpreter::map_TRANSPOSE(Model* model,
                                              OperationPtr operation,
                                              uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -576,7 +577,7 @@ OperationPtr NnApiInterpreter::map_TRANSPOSE(Model* model,
     return std::dynamic_pointer_cast<Operation>(permute);
 }
 
-OperationPtr NnApiInterpreter::map_AVERAGE_POOL_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_AVERAGE_POOL_2D(Model* model,
                                                    OperationPtr operation,
                                                    uint32_t operation_index) {
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
@@ -603,7 +604,7 @@ OperationPtr NnApiInterpreter::map_AVERAGE_POOL_2D(Model* model,
     return pool;
 }
 
-OperationPtr NnApiInterpreter::map_MAX_POOL_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_MAX_POOL_2D(Model* model,
                                                OperationPtr operation,
                                                uint32_t operation_index) {
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
@@ -629,7 +630,7 @@ OperationPtr NnApiInterpreter::map_MAX_POOL_2D(Model* model,
     return pool;
 }
 
-OperationPtr NnApiInterpreter::map_SQUEEZE(Model* model,
+OperationPtr Armnn_Interpreter::map_SQUEEZE(Model* model,
                                            OperationPtr operation,
                                            uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -646,7 +647,7 @@ OperationPtr NnApiInterpreter::map_SQUEEZE(Model* model,
     return squeeze;
 }
 
-OperationPtr NnApiInterpreter::map_PAD(Model* model,
+OperationPtr Armnn_Interpreter::map_PAD(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     std::shared_ptr<PadOperation> pad = std::make_shared<PadOperation>();
@@ -664,7 +665,7 @@ OperationPtr NnApiInterpreter::map_PAD(Model* model,
     return pad;
 }
 
-OperationPtr NnApiInterpreter::map_MUL(Model* model,
+OperationPtr Armnn_Interpreter::map_MUL(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -675,7 +676,7 @@ OperationPtr NnApiInterpreter::map_MUL(Model* model,
     return mul;
 }
 
-OperationPtr NnApiInterpreter::map_MEAN(Model* model,
+OperationPtr Armnn_Interpreter::map_MEAN(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -693,7 +694,7 @@ OperationPtr NnApiInterpreter::map_MEAN(Model* model,
     return mean;
 }
 
-OperationPtr NnApiInterpreter::map_SPACE_TO_DEPTH(Model* model,
+OperationPtr Armnn_Interpreter::map_SPACE_TO_DEPTH(Model* model,
                                                   OperationPtr operation,
                                                   uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -707,7 +708,7 @@ OperationPtr NnApiInterpreter::map_SPACE_TO_DEPTH(Model* model,
     return sp_to_dp;
 }
 
-OperationPtr NnApiInterpreter::map_DEPTH_TO_SPACE(Model* model,
+OperationPtr Armnn_Interpreter::map_DEPTH_TO_SPACE(Model* model,
                                                   OperationPtr operation,
                                                   uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -720,7 +721,7 @@ OperationPtr NnApiInterpreter::map_DEPTH_TO_SPACE(Model* model,
     return dp_to_sp;
 }
 
-OperationPtr NnApiInterpreter::map_SPACE_TO_BATCH_ND(Model* model,
+OperationPtr Armnn_Interpreter::map_SPACE_TO_BATCH_ND(Model* model,
                                                      OperationPtr operation,
                                                      uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 4, 1);
@@ -744,7 +745,7 @@ OperationPtr NnApiInterpreter::map_SPACE_TO_BATCH_ND(Model* model,
     return sp_to_bp;
 }
 
-OperationPtr NnApiInterpreter::map_BATCH_TO_SPACE_ND(Model* model,
+OperationPtr Armnn_Interpreter::map_BATCH_TO_SPACE_ND(Model* model,
                                                      OperationPtr operation,
                                                      uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -763,7 +764,7 @@ OperationPtr NnApiInterpreter::map_BATCH_TO_SPACE_ND(Model* model,
     return bp_to_sp;
 }
 
-OperationPtr NnApiInterpreter::map_RESIZE_BILINEAR(Model* model,
+OperationPtr Armnn_Interpreter::map_RESIZE_BILINEAR(Model* model,
                                                    OperationPtr operation,
                                                    uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -776,7 +777,7 @@ OperationPtr NnApiInterpreter::map_RESIZE_BILINEAR(Model* model,
     return resize;
 }
 
-OperationPtr NnApiInterpreter::map_LOCAL_RESPONSE_NORMALIZATION(Model* model,
+OperationPtr Armnn_Interpreter::map_LOCAL_RESPONSE_NORMALIZATION(Model* model,
                                                                 OperationPtr operation,
                                                                 uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 8, 1);
@@ -795,7 +796,7 @@ OperationPtr NnApiInterpreter::map_LOCAL_RESPONSE_NORMALIZATION(Model* model,
     return lrn;
 }
 
-OperationPtr NnApiInterpreter::map_RNN(Model* model,
+OperationPtr Armnn_Interpreter::map_RNN(Model* model,
                                        OperationPtr operation,
                                        uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 6, 2);
@@ -808,7 +809,7 @@ OperationPtr NnApiInterpreter::map_RNN(Model* model,
     return rnn;
 }
 
-OperationPtr NnApiInterpreter::map_LSTM(Model* model,
+OperationPtr Armnn_Interpreter::map_LSTM(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     std::shared_ptr<LstmUnitOperation> new_op = std::make_shared<LstmUnitOperation>();
@@ -837,7 +838,7 @@ OperationPtr NnApiInterpreter::map_LSTM(Model* model,
     return new_op;
 }
 
-OperationPtr NnApiInterpreter::map_SVDF(Model* model,
+OperationPtr Armnn_Interpreter::map_SVDF(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 7, 2);
@@ -850,7 +851,7 @@ OperationPtr NnApiInterpreter::map_SVDF(Model* model,
     return new_op;
 }
 
-OperationPtr NnApiInterpreter::map_LSH_PROJECTION(Model* model,
+OperationPtr Armnn_Interpreter::map_LSH_PROJECTION(Model* model,
                                                   OperationPtr operation,
                                                   uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 4, 1);
@@ -862,7 +863,7 @@ OperationPtr NnApiInterpreter::map_LSH_PROJECTION(Model* model,
     return new_op;
 }
 
-OperationPtr NnApiInterpreter::map_L2_POOL_2D(Model* model,
+OperationPtr Armnn_Interpreter::map_L2_POOL_2D(Model* model,
                                               OperationPtr operation,
                                               uint32_t operation_index) {
     std::shared_ptr<L2Pool2DOperation> pool = std::make_shared<L2Pool2DOperation>();
@@ -889,7 +890,7 @@ OperationPtr NnApiInterpreter::map_L2_POOL_2D(Model* model,
     return pool;
 }
 
-OperationPtr NnApiInterpreter::map_STRIDED_SLICE(Model* model,
+OperationPtr Armnn_Interpreter::map_STRIDED_SLICE(Model* model,
                                                  OperationPtr operation,
                                                  uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 8, 1);
@@ -910,7 +911,7 @@ OperationPtr NnApiInterpreter::map_STRIDED_SLICE(Model* model,
     return new_op;
 }
 
-OperationPtr NnApiInterpreter::map_BATCH_NORM(Model* model,
+OperationPtr Armnn_Interpreter::map_BATCH_NORM(Model* model,
                                               OperationPtr operation,
                                               uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 7, 1);
@@ -926,7 +927,7 @@ OperationPtr NnApiInterpreter::map_BATCH_NORM(Model* model,
     return new_op;
 }
 
-OperationPtr NnApiInterpreter::map_L2_NORMALIZATION(Model* model,
+OperationPtr Armnn_Interpreter::map_L2_NORMALIZATION(Model* model,
                                                     OperationPtr operation,
                                                     uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -941,7 +942,7 @@ OperationPtr NnApiInterpreter::map_L2_NORMALIZATION(Model* model,
     return l2_norm;
 }
 
-OperationPtr NnApiInterpreter::map_TANH(Model* model,
+OperationPtr Armnn_Interpreter::map_TANH(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
@@ -957,7 +958,7 @@ OperationPtr NnApiInterpreter::map_TANH(Model* model,
     return tanh;
 }
 
-OperationPtr NnApiInterpreter::map_LEAKY_RELU(Model* model,
+OperationPtr Armnn_Interpreter::map_LEAKY_RELU(Model* model,
                                               OperationPtr operation,
                                               uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 2, 1);
@@ -987,4 +988,5 @@ DECLARE_SAMPLE_OP(MAXIMUM, 2, 1, MaximumOperation)
 DECLARE_SAMPLE_OP(MINIMUM, 2, 1, MinimumOperation)
 DECLARE_SAMPLE_OP(RSQRT, 1, 1, RSqrtOperation)
 DECLARE_SAMPLE_OP(PRELU, 2, 1, PReluOperation)
+DECLARE_SAMPLE_OP(DATA_CONVERT, 1, 1, DataConvertOperation)
 }

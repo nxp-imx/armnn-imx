@@ -49,5 +49,6 @@ class NpuSplitterWorkload : public TNpuWorkload<SplitterQueueDescriptor, DataTyp
 
 };
 using NpuSplitterFloat32Workload = NpuSplitterWorkload<armnn::DataType::Float32>;
+using NpuSplitterFloat16Workload = NpuSplitterWorkload<armnn::DataType::Float16>;
 using NpuSplitterUint8Workload = NpuSplitterWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

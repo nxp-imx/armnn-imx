@@ -32,12 +32,12 @@
 #include "nnrt/op/public.hpp"
 
 namespace armnn {
-class NnApiInterpreter : public nnrt::Interpreter {
+class Armnn_Interpreter : public nnrt::Interpreter {
    public:
-    NnApiInterpreter();
-    virtual ~NnApiInterpreter();
+    Armnn_Interpreter();
+    virtual ~Armnn_Interpreter();
 
-    const char* name() override { return "NnApiInterpreter"; }
+    const char* name() override { return "Armnn_Interpreter"; }
 
     int run(nnrt::Model* model, bool* modified) override;
 
@@ -163,13 +163,14 @@ class NnApiInterpreter : public nnrt::Interpreter {
     REGISTER_OP(RSQRT);
     REGISTER_OP(PRELU);
     REGISTER_OP(DECONV_2D);
+    REGISTER_OP(DATA_CONVERT);
 #undef REGISTER_OP
    protected:
     // TODO: Add a parent interpreter class and move this function to it.
     std::vector<uint32_t> reorderOperands(std::vector<uint32_t>& operands, std::vector<int> order);
 
    private:
-    typedef nnrt::op::OperationPtr (NnApiInterpreter::*AddNodeFunc)(nnrt::Model*,
+    typedef nnrt::op::OperationPtr (Armnn_Interpreter::*AddNodeFunc)(nnrt::Model*,
                                                                     nnrt::op::OperationPtr,
                                                                     uint32_t);
     std::map<nnrt::OperationType, AddNodeFunc> op_container_;

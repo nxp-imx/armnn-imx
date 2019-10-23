@@ -7,6 +7,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/backends/neon)
 list(APPEND armnnLibraries armnnNeonBackend)
 
 if(ARMCOMPUTENEON)
+    message("NEON backend is enabled")
     list(APPEND armnnLibraries armnnNeonBackendWorkloads)
     list(APPEND armnnUnitTestLibraries armnnNeonBackendUnitTests)
 else()

@@ -276,8 +276,8 @@ bool NpuLayerSupport::IsActivationSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -339,8 +339,8 @@ bool NpuLayerSupport::IsAdditionSupported(const TensorInfo& input0,
                                           Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -382,8 +382,8 @@ bool NpuLayerSupport::IsBatchNormalizationSupported(
     Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(descriptor);
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -440,8 +440,8 @@ bool NpuLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
     ignore_unused(descriptor);
 
     bool supported = true;
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -522,8 +522,8 @@ bool NpuLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -552,7 +552,8 @@ bool NpuLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
                                   "Npu convolution2d: input and weights types mismatched.");
 
     if (biases.has_value()) {
-        std::array<DataType, 3> biasesSupportedTypes = {DataType::Float32, DataType::Signed32};
+        std::array<DataType, 3> biasesSupportedTypes = {
+            DataType::Float32, DataType::Signed32, DataType::Float16};
         supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes),
                                       reasonIfUnsupported,
                                       "Npu convolution2d: biases is not a supported type.");
@@ -571,51 +572,49 @@ bool NpuLayerSupport::IsDebugSupported(const TensorInfo& input,
         reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
 
-bool NpuLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
-                                                      const TensorInfo& output,
-                                                      const DepthwiseConvolution2dDescriptor& descriptor,
-                                                      const TensorInfo& weights,
-                                                      const Optional<TensorInfo>& biases,
-                                                      Optional<std::string&> reasonIfUnsupported) const
-{
+bool NpuLayerSupport::IsDepthwiseConvolutionSupported(
+    const TensorInfo& input,
+    const TensorInfo& output,
+    const DepthwiseConvolution2dDescriptor& descriptor,
+    const TensorInfo& weights,
+    const Optional<TensorInfo>& biases,
+    Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType,2> supportedTypes =
-    {
-        DataType::Float32,
-        DataType::QuantisedAsymm8,
-    };
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16};
 
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes),
+                                  reasonIfUnsupported,
                                   "Npu DepthwiseConvolution2d: input is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes),
+                                  reasonIfUnsupported,
                                   "Npu DepthwiseConvolution2d: output is not a supported type.");
 
-    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypeAnyOf(weights, supportedTypes),
+                                  reasonIfUnsupported,
                                   "Npu DepthwiseConvolution2d: weights is not a supported type.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+    supported &= CheckSupportRule(TypesAreEqual(input, output),
+                                  reasonIfUnsupported,
                                   "Npu DepthwiseConvolution2d: input and output types mismatched.");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, weights), reasonIfUnsupported,
-                                  "Npu DepthwiseConvolution2d: input and weights types mismatched.");
-
-    if (biases.has_value())
-    {
-        std::array<DataType,2> biasesSupportedTypes =
-        {
-            DataType::Float32,
-            DataType::Signed32
-        };
-        supported &= CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes), reasonIfUnsupported,
-                                      "Npu DepthwiseConvolution2d: biases is not a supported type.");
+    supported &=
+        CheckSupportRule(TypesAreEqual(input, weights),
+                         reasonIfUnsupported,
+                         "Npu DepthwiseConvolution2d: input and weights types mismatched.");
+    if (biases.has_value()) {
+        std::array<DataType, 3> biasesSupportedTypes = {
+            DataType::Float32, DataType::Signed32, DataType::Float16};
+        supported &=
+            CheckSupportRule(TypeAnyOf(biases.value(), biasesSupportedTypes),
+                             reasonIfUnsupported,
+                             "Npu DepthwiseConvolution2d: biases is not a supported type.");
     }
     ignore_unused(descriptor);
-
     return supported;
-
 }
 
 bool NpuLayerSupport::IsDequantizeSupported(const TensorInfo& input,
@@ -685,8 +684,8 @@ bool NpuLayerSupport::IsDivisionSupported(const TensorInfo& input0,
                                           Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -766,8 +765,8 @@ bool NpuLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported types.
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -793,7 +792,8 @@ bool NpuLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
 
     if (descriptor.m_BiasEnabled) {
         // Defined supported types for bias
-        std::array<DataType, 2> supportedBiasTypes = {DataType::Float32, DataType::Signed32};
+        std::array<DataType, 3> supportedBiasTypes = {
+            DataType::Float32, DataType::Signed32, DataType::Float16};
 
         supported &= CheckSupportRule(TypeAnyOf(biases, supportedBiasTypes),
                                       reasonIfUnsupported,
@@ -847,8 +847,8 @@ bool NpuLayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
                                                  Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(descriptor);
     // Define supported types
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8};
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16};
 
     bool supported = true;
 
@@ -976,8 +976,8 @@ bool NpuLayerSupport::IsMaximumSupported(const TensorInfo& input0,
                                          Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1016,8 +1016,8 @@ bool NpuLayerSupport::IsMeanSupported(const TensorInfo& input,
     std::string meanLayerStr = "Mean";
     std::string outputTensorStr = "output";
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1093,8 +1093,8 @@ bool NpuLayerSupport::IsMinimumSupported(const TensorInfo& input0,
                                          Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1131,8 +1131,8 @@ bool NpuLayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
                                                 Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1175,8 +1175,8 @@ bool NpuLayerSupport::IsNormalizationSupported(const TensorInfo& input,
     ignore_unused(descriptor);
 
     // Define supported types
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8};
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16};
 
     bool supported = true;
 
@@ -1202,7 +1202,7 @@ bool NpuLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 
 bool NpuLayerSupport::IsOutputSupported(const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const {
-    return false;
+    return true;
 }
 
 bool NpuLayerSupport::IsPadSupported(const TensorInfo& input,
@@ -1245,8 +1245,8 @@ bool NpuLayerSupport::IsPooling2dSupported(const TensorInfo& input,
     bool supported = true;
 
     // Define supported output and inputs types.
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1301,9 +1301,9 @@ bool NpuLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                          Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(descriptor);
     // Define supported output types.
-    std::array<DataType, 2> supportedOutputTypes = {
+    std::array<DataType, 3> supportedOutputTypes = {
         DataType::Float32,
-        // DataType::Float16,
+        DataType::Float16,
         DataType::QuantisedAsymm8,
         // DataType::QuantisedSymm16
     };
@@ -1370,8 +1370,8 @@ bool NpuLayerSupport::IsSoftmaxSupported(const TensorInfo& input,
                                          Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(output);
     bool supported = true;
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1402,7 +1402,8 @@ bool NpuLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
                                                 Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(output);
     bool supported = true;
-    std::array<DataType, 2> supportedTypes = {DataType::Float32, DataType::QuantisedAsymm8};
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16};
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes),
                                   reasonIfUnsupported,
@@ -1430,8 +1431,8 @@ bool NpuLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
     ignore_unused(descriptor);
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes),
@@ -1489,8 +1490,8 @@ bool NpuLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                              Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes = {
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1528,8 +1529,8 @@ bool NpuLayerSupport::IsPreluSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
 
-    std::array<DataType, 2> supportedTypes{
-        DataType::Float32, DataType::QuantisedAsymm8,
+    std::array<DataType, 3> supportedTypes{
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 
@@ -1568,7 +1569,7 @@ bool NpuLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
 
     // Define supported types.
     std::array<DataType, 3> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8,
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16
         // DataType::QuantisedSymm16
     };
 

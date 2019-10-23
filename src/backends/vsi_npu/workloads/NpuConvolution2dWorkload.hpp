@@ -28,6 +28,7 @@
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
 #include <boost/log/trivial.hpp>
+#include <FloatingPointConverter.hpp>
 #include "TNpuWorkloads.hpp"
 
 #include "FakeBiasSelector.hpp"
@@ -74,10 +75,19 @@ class NpuConvolution2dWorkload : public TNpuWorkload<Convolution2dQueueDescripto
         // Add bias operand
         // assert(m_Bias != nullptr);
         if (m_Bias) {
-            const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
+            TensorInfo biasInfo = m_Bias->GetTensorInfo();
             const TensorShape biasShape = m_Bias->GetShape();
-            inputIds[2] =
-                this->AddOperandAndSetValue(biasInfo, biasShape, m_Bias->GetTensor<void>());
+            if (biasInfo.GetDataType() == DataType::Float16) {
+                biasInfo.SetDataType(DataType::Float32);
+                m_Fp32BiasData.reset(new float[biasInfo.GetNumElements()]);
+                armnnUtils::FloatingPointConverter::ConvertFloat16To32(
+                    m_Bias->GetTensor<Half>(), biasInfo.GetNumElements(), m_Fp32BiasData.get());
+                inputIds[2] =
+                    this->AddOperandAndSetValue(biasInfo, biasShape, m_Fp32BiasData.get());
+            } else {
+                inputIds[2] =
+                    this->AddOperandAndSetValue(biasInfo, biasShape, m_Bias->GetTensor<void>());
+            }
         } else {
             TensorShape biasShape(1);
             TensorInfo biasInfo(biasShape, FakeBias::value);
@@ -152,7 +162,9 @@ class NpuConvolution2dWorkload : public TNpuWorkload<Convolution2dQueueDescripto
     armnn::DataLayout m_DataLayout;
 
     std::vector<typename FakeBias::type> m_FakeBiasData;  //!< workaround: bias required by shader
+    mutable boost::scoped_array<float> m_Fp32BiasData;
 };
 using NpuConvolution2dFloat32Workload = NpuConvolution2dWorkload<armnn::DataType::Float32>;
+using NpuConvolution2dFloat16Workload = NpuConvolution2dWorkload<armnn::DataType::Float16>;
 using NpuConvolution2dUint8Workload = NpuConvolution2dWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

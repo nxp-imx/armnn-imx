@@ -1,7 +1,27 @@
-//
-// Copyright © 2017 Arm Ltd. All rights reserved.
-// SPDX-License-Identifier: MIT
-//
+/****************************************************************************
+*
+*    Copyright (c) 2019 Vivante Corporation
+*
+*    Permission is hereby granted, free of charge, to any person obtaining a
+*    copy of this software and associated documentation files (the "Software"),
+*    to deal in the Software without restriction, including without limitation
+*    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+*    and/or sell copies of the Software, and to permit persons to whom the
+*    Software is furnished to do so, subject to the following conditions:
+*
+*    The above copyright notice and this permission notice shall be included in
+*    all copies or substantial portions of the Software.
+*
+*    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+*    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+*    DEALINGS IN THE SOFTWARE.
+*
+*****************************************************************************/
+
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
@@ -155,91 +175,90 @@ BOOST_AUTO_TEST_CASE(TrivialAdd) {
     BOOST_TEST(outputData[11] == 1212);
 }
 
-// BOOST_AUTO_TEST_CASE(MultipleOutputs) {
-//     using namespace armnn;
+BOOST_AUTO_TEST_CASE(MultipleOutputs) {
+    using namespace armnn;
 
-//     // Create runtime in which test will run
-//     armnn::IRuntime::CreationOptions options;
-//     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    // Create runtime in which test will run
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
-//     // Builds up the structure of the network.
-//     INetworkPtr net(INetwork::Create());
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
 
-//     IConnectableLayer* input = net->AddInputLayer(0);
+    IConnectableLayer* input = net->AddInputLayer(0);
 
-//     // ReLu1
-//     ActivationDescriptor activation1Descriptor;
-//     activation1Descriptor.m_Function = ActivationFunction::BoundedReLu;
-//     activation1Descriptor.m_A = 1.f;
-//     activation1Descriptor.m_B = -1.f;
-//     IConnectableLayer* activation1 = net->AddActivationLayer(activation1Descriptor);
+    // ReLu1
+    ActivationDescriptor activation1Descriptor;
+    activation1Descriptor.m_Function = ActivationFunction::BoundedReLu;
+    activation1Descriptor.m_A = 1.f;
+    activation1Descriptor.m_B = -1.f;
+    IConnectableLayer* activation1 = net->AddActivationLayer(activation1Descriptor);
 
-//     // ReLu6
-//     ActivationDescriptor activation2Descriptor;
-//     activation2Descriptor.m_Function = ActivationFunction::BoundedReLu;
-//     activation2Descriptor.m_A = 6.0f;
-//     IConnectableLayer* activation2 = net->AddActivationLayer(activation2Descriptor);
+    // ReLu6
+    ActivationDescriptor activation2Descriptor;
+    activation2Descriptor.m_Function = ActivationFunction::BoundedReLu;
+    activation2Descriptor.m_A = 6.0f;
+    IConnectableLayer* activation2 = net->AddActivationLayer(activation2Descriptor);
 
-//     // BoundedReLu(min=2, max=5)
-//     ActivationDescriptor activation3Descriptor;
-//     activation3Descriptor.m_Function = ActivationFunction::BoundedReLu;
-//     activation3Descriptor.m_A = 5.0f;
-//     activation3Descriptor.m_B = 2.0f;
-//     IConnectableLayer* activation3 = net->AddActivationLayer(activation3Descriptor);
+    // BoundedReLu(min=2, max=5)
+    ActivationDescriptor activation3Descriptor;
+    activation3Descriptor.m_Function = ActivationFunction::BoundedReLu;
+    activation3Descriptor.m_A = 5.0f;
+    activation3Descriptor.m_B = 2.0f;
+    IConnectableLayer* activation3 = net->AddActivationLayer(activation3Descriptor);
 
-//     IConnectableLayer* output1 = net->AddOutputLayer(0);
-//     IConnectableLayer* output2 = net->AddOutputLayer(1);
-//     IConnectableLayer* output3 = net->AddOutputLayer(2);
+    IConnectableLayer* output1 = net->AddOutputLayer(0);
+    IConnectableLayer* output2 = net->AddOutputLayer(1);
+    IConnectableLayer* output3 = net->AddOutputLayer(2);
 
-//     input->GetOutputSlot(0).Connect(activation1->GetInputSlot(0));
-//     input->GetOutputSlot(0).Connect(activation2->GetInputSlot(0));
-//     input->GetOutputSlot(0).Connect(activation3->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(activation1->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(activation2->GetInputSlot(0));
+    input->GetOutputSlot(0).Connect(activation3->GetInputSlot(0));
 
-//     activation1->GetOutputSlot(0).Connect(output1->GetInputSlot(0));
-//     activation2->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
-//     activation3->GetOutputSlot(0).Connect(output3->GetInputSlot(0));
+    activation1->GetOutputSlot(0).Connect(output1->GetInputSlot(0));
+    activation2->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
+    activation3->GetOutputSlot(0).Connect(output3->GetInputSlot(0));
 
-//     // Sets the tensors in the network.
-//     TensorInfo tensorInfo(TensorShape({10}), DataType::Float32);
-//     input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-//     activation1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-//     activation2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-//     activation3->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    // Sets the tensors in the network.
+    TensorInfo tensorInfo(TensorShape({10}), DataType::Float32);
+    input->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    activation1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    activation2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    activation3->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
-//     // optimize the network
-//     IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
+    // optimize the network
+    IOptimizedNetworkPtr optNet = Optimize(*net, defaultBackends, runtime->GetDeviceSpec());
 
-//     // Loads it into the runtime.
-//     NetworkId netId;
-//     runtime->LoadNetwork(netId, std::move(optNet));
+    // Loads it into the runtime.
+    NetworkId netId;
+    runtime->LoadNetwork(netId, std::move(optNet));
 
-//     // Creates structures for input & output.
-//     const std::vector<float> inputData{3.f, 5.f, 2.f, 3.f, 7.f, 0.f, -2.f, -1.f, 3.f, 3.f};
+    // Creates structures for input & output.
+    const std::vector<float> inputData{3.f, 5.f, 2.f, 3.f, 7.f, 0.f, -2.f, -1.f, 3.f, 3.f};
 
-//     std::vector<float> output1Data(inputData.size());
-//     std::vector<float> output2Data(inputData.size());
-//     std::vector<float> output3Data(inputData.size());
+    std::vector<float> output1Data(inputData.size());
+    std::vector<float> output2Data(inputData.size());
+    std::vector<float> output3Data(inputData.size());
 
-//     InputTensors inputTensors{
-//         {0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}};
-//     OutputTensors outputTensors{
-//         {0, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), output1Data.data())},
-//         {1, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 1), output2Data.data())},
-//         {2, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 2), output3Data.data())}};
+    InputTensors inputTensors{
+        {0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}};
+    OutputTensors outputTensors{
+        {0, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), output1Data.data())},
+        {1, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 1), output2Data.data())},
+        {2, armnn::Tensor(runtime->GetOutputTensorInfo(netId, 2), output3Data.data())}
+        };
 
-//     // Does the inference.
-//     runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+    // Does the inference.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
 
-//     // Checks the results.
-//     BOOST_TEST(output1Data ==
-//                std::vector<float>({1.f, 1.f, 1.f, 1.f, 1.f, 0.f, -1.f, -1.f, 1.f, 1.f}));  //
-//                ReLu1
-//     BOOST_TEST(output2Data ==
-//                std::vector<float>({3.f, 5.f, 2.f, 3.f, 6.f, 0.f, 0.f, 0.f, 3.f, 3.f}));  // ReLu6
-//     BOOST_TEST(output3Data ==
-//                std::vector<float>({3.f, 5.f, 2.f, 3.f, 5.f, 2.f, 2.f, 2.f, 3.f, 3.f}));  // [2,
-//                5]
-// }
+    // Checks the results.
+    BOOST_TEST(output1Data ==
+               std::vector<float>({1.f, 1.f, 1.f, 1.f, 1.f, 0.f, -1.f, -1.f, 1.f, 1.f}));  // ReLu1
+    BOOST_TEST(output2Data ==
+               std::vector<float>({3.f, 5.f, 2.f, 3.f, 6.f, 0.f, 0.f, 0.f, 3.f, 3.f}));  // ReLu6
+    BOOST_TEST(output3Data ==
+               std::vector<float>({3.f, 5.f, 2.f, 3.f, 5.f, 2.f, 2.f, 2.f, 3.f, 3.f}));  // [2, 5]
+}
 
 BOOST_AUTO_TEST_CASE(TrivialMin) {
     using namespace armnn;

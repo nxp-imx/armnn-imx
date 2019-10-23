@@ -71,6 +71,10 @@ using NpuMemCopyFloat32Workload = NpuTensorCopyWorkload<
         MemCopyQueueDescriptor, nnrt::OperationType::DATA_CONVERT,
         armnn::DataType::Float32>;
 
+using NpuMemCopyFloat16Workload = NpuTensorCopyWorkload<
+        MemCopyQueueDescriptor, nnrt::OperationType::DATA_CONVERT,
+        armnn::DataType::Float16>;
+
 using NpuMemCopyUint8Workload = NpuTensorCopyWorkload<
         MemCopyQueueDescriptor, nnrt::OperationType::DATA_CONVERT,
         armnn::DataType::QuantisedAsymm8>;

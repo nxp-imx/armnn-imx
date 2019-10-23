@@ -481,7 +481,7 @@ if(ARMCOMPUTECL)
     target_link_libraries(armnn ${OPENCL_LIBRARIES})
 endif()
 if(VSI_NPU)
-    target_link_libraries(armnn ${VSINPU_LIBRARIES})
+    target_link_libraries(armnn ${VSI_NPU_LIBRARIES})
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE)

@@ -32,13 +32,9 @@ list(APPEND armnnNpuBackendWorkloads_sources
     NpuDepthWiseConvolution2dWorkload.hpp
     NpuElementwiseWorkload.hpp
     NpuFullyConnectedWorkload.hpp
-    NpuInputWorkload.cpp
-    NpuInputWorkload.hpp
     NpuL2NormalizationWorkload.hpp
     NpuLstmWorkload.hpp
     NpuMeanWorkload.hpp
-    NpuOutputWorkload.cpp
-    NpuOutputWorkload.hpp
     NpuPadWorkload.hpp
     NpuPermuteWorkload.hpp
     NpuPooling2dWorkload.hpp
@@ -58,15 +54,8 @@ list(APPEND armnnNpuBackendWorkloads_sources
 )
 
 add_library(armnnNpuBackendWorkloads OBJECT ${armnnNpuBackendWorkloads_sources})
-set(OVXLIB_DIR $ENV{OVXLIB_DIR})
-set(OVXLIB_INCLUDE ${OVXLIB_DIR}/include)
-set(OVX_DRIVER_ROOT $ENV{VIVANTE_SDK_DIR})
-set(OVX_DRIVER_INCLUDE ${OVX_DRIVER_ROOT}/include)
-set(OVX_DRIVER_LIB     ${OVX_DRIVER_ROOT}/drivers)
-set(NNRT_ROOT $ENV{NNRT_ROOT})
-set(NNRT_INCLUDE ${NNRT_ROOT}/include)
 include_directories(${OVXLIB_INCLUDE}
-    ${OVX_DRIVER_INCLUDE}
+    ${OPENVX_DRIVER_INCLUDE}
     ${NNRT_INCLUDE}
     ${NNRT_INCLUDE}/graph_transformations
     ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu
