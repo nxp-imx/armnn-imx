@@ -27,7 +27,7 @@ list(APPEND armnnLibraries armnnNpuBackend)
 
 if(VSI_NPU)
     message("VSI NPU backend is enabled")
-    list(APPEND armnnLibraries armnnNpuBackendWorkloads)
+    list(APPEND armnnLibraries)
     list(APPEND armnnUnitTestLibraries armnnNpuBackendUnitTests)
 else()
     message("VSI NPU backend is disabled")

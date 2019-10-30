@@ -263,20 +263,9 @@ if (VSI_NPU)
         # The following files are checked during search for include dirs. This makes sure 
         # there is correct directory structure and that at least one valid file exists.
         set(OPENVX_HEADER_FILE "VX/vx.h")
-        set(OVXLIB_HEADER_FILE "vsi_nn_context.h")
+        set(OVXLIB_HEADER_FILE "vsi_nn_pub.h")
         set(NNRT_HEADER_FILE "nnrt/ovxlib_delegate.hpp")
         set(NNRT_HEADER_FILE_2 "ovxlib_delegate.hpp")
-
-        # In case only the GPU driver root is defined and ovxlib and nnrt roots are 
-        # not try to use it. It's usually the same folder.
-        if (DEFINED OPENVX_DRIVER_ROOT)
-            if (NOT DEFINED OVXLIB_ROOT)
-                set(OVXLIB_ROOT "${OPENVX_DRIVER_ROOT}")
-            endif()
-            if (NOT DEFINED NNRT_ROOT)
-                set(NNRT_ROOT "${OPENVX_DRIVER_ROOT}")
-            endif()
-        endif()
 
         # NO_CMAKE_FIND_ROOT_PATH makes sure that we only search in provided directory and
         # do not modify ROOT path using CMAKE_FIND_ROOT_PATH. If we do not find includes/libs
@@ -317,19 +306,20 @@ if (VSI_NPU)
 
         if (NOT DEFINED OVXLIB_INCLUDE)
             find_path(OVXLIB_INCLUDE "${OVXLIB_HEADER_FILE}"
-                    PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT}
+                    PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
                     PATH_SUFFIXES include include/OVXLIB OVXLIB inc inc/OVXLIB
                     NO_CMAKE_FIND_ROOT_PATH)
             if(NOT OVXLIB_INCLUDE)
-                find_path(OPENVX_DRIVER_INCLUDE "${OVXLIB_HEADER_FILE}"
-                        PATHS "/usr/include" "/usr/local/include")
+                find_path(OVXLIB_INCLUDE "${OVXLIB_HEADER_FILE}"
+                        PATHS "/usr/include" "/usr/local/include"
+                        PATH_SUFFIXES OVXLIB)
             endif()
         endif()
         message(STATUS "Ovxlib headers are located at: ${OVXLIB_INCLUDE}")
 
         if (NOT DEFINED OVXLIB_LIB)
             find_library(OVXLIB_LIB NAMES ovxlib
-                        PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT}
+                        PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
                         PATH_SUFFIXES lib drivers lib64
                         NO_CMAKE_FIND_ROOT_PATH)
             if(NOT OVXLIB_LIB)
@@ -341,7 +331,7 @@ if (VSI_NPU)
 
         if (NOT DEFINED NNRT_INCLUDE)
             find_path(NNRT_INCLUDE "${NNRT_HEADER_FILE}"
-                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT}
+                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
                     PATH_SUFFIXES include inc
                     NO_CMAKE_FIND_ROOT_PATH)
             if(NOT NNRT_INCLUDE)
@@ -354,8 +344,8 @@ if (VSI_NPU)
         # used by its dependencies, so we add both nnrt/*.hpp and *.hpp.
         if (NOT DEFINED NNRT_INCLUDE_2)
             find_path(NNRT_INCLUDE_2 "${NNRT_HEADER_FILE_2}"
-                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT}
-                    PATH_SUFFIXES include inc include/nnrt inc/nnrt nnrt/include nnrt/inc
+                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                    PATH_SUFFIXES include inc include/nnrt inc/nnrt nnrt/include nnrt/inc nnrt
                     NO_CMAKE_FIND_ROOT_PATH)
             if(NOT NNRT_INCLUDE_2)
                 find_path(NNRT_INCLUDE_2 "${NNRT_HEADER_FILE_2}"
@@ -368,7 +358,7 @@ if (VSI_NPU)
 
         if (NOT DEFINED NNRT_LIB)
             find_library(NNRT_LIB NAMES nnrt
-                        PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT}
+                        PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
                         PATH_SUFFIXES lib drivers lib64
                         NO_CMAKE_FIND_ROOT_PATH)
             if(NOT NNRT_LIB)

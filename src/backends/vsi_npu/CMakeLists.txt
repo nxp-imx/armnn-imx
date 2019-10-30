@@ -25,32 +25,20 @@
 if(VSI_NPU)
     list(APPEND armnnNpuBackend_sources
         arm_nn_interpreter.cpp
-        arm_nn_interpreter.hpp
         NpuBackendContext.cpp
-        NpuBackendContext.hpp
         NpuBackend.cpp
-        NpuBackend.hpp
-        NpuBackendId.hpp
         NpuLayerSupport.cpp
-        NpuLayerSupport.hpp
         NpuModelShell.cpp
-        NpuModelShell.hpp
         NpuTensorAllocator.cpp
-        NpuTensorAllocator.hpp
         NpuTensorHandler.cpp
-        NpuTensorHandler.hpp
         NpuWorkloadFactory.cpp
-        NpuWorkloadFactory.hpp
     )
-    add_subdirectory(workloads)
     if(BUILD_UNIT_TESTS)
         add_subdirectory(test)
     endif()    
 else()
     list(APPEND armnnNpuBackend_sources
-        NpuBackendId.hpp
         NpuLayerSupport.cpp
-        NpuLayerSupport.hpp
     )
 endif()
 
@@ -58,7 +46,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
                     -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
 add_library(armnnNpuBackend OBJECT ${armnnNpuBackend_sources})
+include_directories(${OVXLIB_INCLUDE}
+    ${OVX_DRIVER_INCLUDE}
+    ${NNRT_INCLUDE}
+)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
+target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/workloads)
