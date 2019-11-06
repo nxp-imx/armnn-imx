@@ -1,17 +1,29 @@
-# UnitTests
+#/****************************************************************************
+#*
+#*    Copyright 2019 NXP
+#*
+#*    Permission is hereby granted, free of charge, to any person obtaining a
+#*    copy of this software and associated documentation files (the "Software"),
+#*    to deal in the Software without restriction, including without limitation
+#*    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#*    and/or sell copies of the Software, and to permit persons to whom the
+#*    Software is furnished to do so, subject to the following conditions:
+#*
+#*    The above copyright notice and this permission notice shall be included in
+#*    all copies or substantial portions of the Software.
+#*
+#*    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#*    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#*    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#*    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#*    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#*    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#*    DEALINGS IN THE SOFTWARE.
+#*
+#*****************************************************************************/
+
 include(CheckIncludeFiles)
 
-# Setup the inference test framework
-#set(inference_test_sources
-    #../ClassifierTestCaseData.hpp
-    #../InferenceModel.hpp
-    #../InferenceTest.hpp
-    #../InferenceTest.inl
-    #../InferenceTest.cpp
-    #../InferenceTestImage.hpp
-    #../InferenceTestImage.cpp)
-
-#add_library_ex(inferenceTest STATIC ${inference_test_sources})
 target_include_directories(inferenceTest PRIVATE ../../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../../src/backends)
 target_include_directories(inferenceTest PRIVATE ../../third-party/stb)
@@ -155,18 +167,6 @@ if(BUILD_TF_PARSER)
         addDllCopyCommands(${testName})
     endmacro()
 
-    #set(TfMnist-Armnn_sources
-    #    TfMnist-Armnn/TfMnist-Armnn.cpp
-    #    MnistDatabase.hpp
-    #    MnistDatabase.cpp)
-    #TfParserTest(TfMnist-Armnn "${TfMnist-Armnn_sources}")
-
-    #set(TfCifar10-Armnn_sources
-    #    TfCifar10-Armnn/TfCifar10-Armnn.cpp
-    #    Cifar10Database.hpp
-    #    Cifar10Database.cpp)
-    #TfParserTest(TfCifar10-Armnn "${TfCifar10-Armnn_sources}")
-
     set(VSI-TfMobileNet-Armnn_sources
         TfMobileNet-Armnn.cpp
         ../ImagePreprocessor.hpp
@@ -179,11 +179,6 @@ if(BUILD_TF_PARSER)
         ../ImagePreprocessor.cpp)
     TfParserTest(VSI-TfInceptionV3-Armnn "${VSI-TfInceptionV3-Armnn_sources}")
 
-    #set(TfResNext-Armnn_sources
-    #    TfResNext_Quantized-Armnn/TfResNext_Quantized-Armnn.cpp
-    #    CaffePreprocessor.hpp
-    #    CaffePreprocessor.cpp)
-    #TfParserTest(TfResNext-Armnn "${TfResNext-Armnn_sources}")
 endif()
 
 if (BUILD_TF_LITE_PARSER)
@@ -231,18 +226,6 @@ if (BUILD_TF_LITE_PARSER)
         ../ImagePreprocessor.hpp
         ../ImagePreprocessor.cpp)
     TfLiteParserTest(VSI-TfLiteDensenetFloat-Armnn "${VSI-TfLiteDensenetFloat-Armnn_sources}")
-
-    #set(TfLiteMobilenetQuantized-Armnn_sources
-    #    TfLiteMobilenetQuantized-Armnn.cpp
-    #    ../ImagePreprocessor.hpp
-    #    ../ImagePreprocessor.cpp)
-    #TfLiteParserTest(TfLiteMobilenetQuantized-Armnn "${TfLiteMobilenetQuantized-Armnn_sources}")
-
-    #set(TfLiteResNetV2-Armnn_sources
-    #    TfLiteResNetV2-Armnn.cpp
-    #    ../ImagePreprocessor.hpp
-    #    ../ImagePreprocessor.cpp)
-    #TfLiteParserTest(TfLiteResNetV2-Armnn "${TfLiteResNetV2-Armnn_sources}")
 
     set(VSI-TfLiteSqueezenetFloat-Armnn_sources
         TfLiteSqueezenetFloat-Armnn.cpp

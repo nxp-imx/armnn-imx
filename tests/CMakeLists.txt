@@ -1,3 +1,7 @@
+# This file originates from project "Arm NN ML software" (available on https://github.com/VeriSilicon/armnn)
+# Original copyright owner Vivante Corporation licensed its use under terms of MIT license
+# Modified by NXP: Copyright 2019 NXP
+
 # UnitTests
 include(CheckIncludeFiles)
 

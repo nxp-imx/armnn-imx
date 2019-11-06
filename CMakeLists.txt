@@ -1,7 +1,9 @@
 #
 # Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright 2019 NXP
 # SPDX-License-Identifier: MIT
 #
+
 cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
 project(armnn)
 
