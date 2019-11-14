@@ -57,18 +57,22 @@ TensorShape NpuTensorHandler::GetStrides() const
     return TensorShape(shape.GetNumDimensions(), strides.data());
 }
 
-void NpuTensorHandler::CopyOutTo(void* memory) const
-{
+void NpuTensorHandler::CopyOutTo(void* memory) const {
     getMemoryReady();
-
-    std::memcpy(memory, m_Memory.get(), m_TensorInfo.GetNumBytes());
+    if (m_ExternalMem) {
+        std::memcpy(memory, m_ExternalMem, m_TensorInfo.GetNumBytes());
+    } else {
+        std::memcpy(memory, m_Memory.get(), m_TensorInfo.GetNumBytes());
+    }
 }
 
-void NpuTensorHandler::CopyInFrom(const void* memory)
-{
+void NpuTensorHandler::CopyInFrom(const void* memory) {
     getMemoryReady();
-
-    std::memcpy(m_Memory.get(), memory, m_TensorInfo.GetNumBytes());
+    if (m_ExternalMem) {
+        std::memcpy(m_ExternalMem, memory, m_TensorInfo.GetNumBytes());
+    } else {
+        std::memcpy(m_Memory.get(), memory, m_TensorInfo.GetNumBytes());
+    }
 }
 
 TensorShape NpuTensorHandler::GetShape() const
@@ -79,13 +83,13 @@ TensorShape NpuTensorHandler::GetShape() const
 void* NpuTensorHandler::Map(bool blocking)
 {
     getMemoryReady();
-    return static_cast<void*>(m_Memory.get());
+    return m_ExternalMem ? m_ExternalMem : static_cast<void*>(m_Memory.get());
 }
 
 const void* NpuTensorHandler::Map(bool blocking) const
 {
     getMemoryReady();
-    return static_cast<const void*>(m_Memory.get());
+    return m_ExternalMem ? m_ExternalMem : static_cast<const void*>(m_Memory.get());
 }
 
 void* NpuTensorHandler::GetMemArea()
@@ -105,9 +109,12 @@ void NpuTensorHandler::getMemoryReady() const {
     // If InputHandle already allocated memory: means it allocated by previous sub-graph allocated on our backend.
     // In this case, we should not be here because we didn't ask memory allocation internally.
     if (IsInputTensor) {
-        m_Memory.reset(new uint8_t[m_TensorInfo.GetNumBytes()]);
-        // Keep this track random caculation error issue
-        BOOST_LOG_TRIVIAL(info) << "allocated memory at" << m_Memory.get() << ", size = "<<m_TensorInfo.GetNumBytes();
+        if (nullptr == m_ExternalMem) {
+            m_Memory.reset(new uint8_t[m_TensorInfo.GetNumBytes()]);
+            // Keep this track random caculation error issue
+            BOOST_LOG_TRIVIAL(info) << "allocated memory at" << m_Memory.get()
+                                    << ", size = " << m_TensorInfo.GetNumBytes();
+        }
         return;
     }
 

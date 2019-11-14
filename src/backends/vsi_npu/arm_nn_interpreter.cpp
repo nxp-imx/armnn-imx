@@ -28,6 +28,7 @@
 #include "nnrt/error.hpp"
 #include "nnrt/model.hpp"
 #include "nnrt/types.hpp"
+#include "nnrt/logging.hpp"
 
 #include "arm_nn_interpreter.hpp"
 
@@ -90,7 +91,7 @@ namespace armnn {
     do {                                                                \
         if ((in_num > 0 && op->inputs().size() != (size_t)in_num) ||    \
             (out_num > 0 && op->outputs().size() != (size_t)out_num)) { \
-            VSILOGE("Operation IO number mismatch. %d(%d), %d(%d)",     \
+            NNRT_LOGE_PRINT("Operation IO number mismatch. %d(%d), %d(%d)",     \
                     op->inputs().size(),                                \
                     in_num,                                             \
                     op->outputs().size(),                               \
@@ -186,7 +187,7 @@ int Armnn_Interpreter::run(Model* model, bool* modified) {
     for (auto it = operations.begin(); it != operations.end(); ++it) {
         OperationPtr op = it->second;
         if (op_container_.find(op->type()) == op_container_.end()) {
-            VSILOGW("Not support operation %d", op->type());
+            NNRT_LOGW_PRINT("Not support operation %d", op->type());
             return NNA_ERROR_CODE(BAD_DATA);
         }
     }
@@ -194,21 +195,21 @@ int Armnn_Interpreter::run(Model* model, bool* modified) {
     for (auto it = operations.begin(); it != operations.end(); ++it) {
         uint32_t idx = it->first;
         OperationPtr op = it->second;
-        VSILOGI("Convert node %u(%d)", idx, op->type());
+        NNRT_LOGI_PRINT("Convert node %u(%d)", idx, op->type());
         OperationPtr new_operation = (this->*op_container_[op->type()])(model, op, idx);
         if (!new_operation) {
-            VSILOGW("Build operation: %d, index: %d fail", op->type(), idx);
+            NNRT_LOGW_PRINT("Build operation: %d, index: %d fail", op->type(), idx);
             return NNA_ERROR_CODE(OUT_OF_MEMORY);
         }
         replaceOperation(model, idx, new_operation);
     }
 
-    VSILOGD("Convert operation completed.");
+    NNRT_LOGD_PRINT("Convert operation completed.");
     // Unique vector
     for (uint32_t index : operands_to_remove_) {
-        // VSILOGD("Remove %d", index);
+        // NNRT_LOGD_PRINT("Remove %d", index);
         if (model->isInput(index) || model->isOutput(index)) {
-            VSILOGW(
+            NNRT_LOGW_PRINT(
                 "Try remove operand(%u) from model input or output, \
 some operations may not support dynamic configure.",
                 index);
@@ -262,7 +263,7 @@ PadType Armnn_Interpreter::mapPadType(int code) {
             type = PadType::VALID;
             break;
         default:
-            VSILOGE("Invalid padding type(%d)", type);
+            NNRT_LOGE_PRINT("Invalid padding type(%d)", type);
             assert(false);
             break;
     }
@@ -279,7 +280,7 @@ LshProjectionType Armnn_Interpreter::mapLshProjectionType(int value) {
             type = LshProjectionType::DENSE;
             break;
         default:
-            VSILOGW("Unknow lsh projection type: %d", value);
+            NNRT_LOGW_PRINT("Unknow lsh projection type: %d", value);
             break;
     }
     return type;
@@ -304,7 +305,7 @@ FusedType Armnn_Interpreter::mapLstmActivationType(int value) {
             type = FusedType::SIGMOID;
             break;
         default:
-            VSILOGW("Unknown lstm activation: %d.", value);
+            NNRT_LOGW_PRINT("Unknown lstm activation: %d.", value);
             break;
     }
     return type;
@@ -316,7 +317,7 @@ std::vector<uint32_t> Armnn_Interpreter::reorderOperands(std::vector<uint32_t>& 
     new_operands = operands;
     for (uint32_t i = 0; i < order.size(); ++i) {
         if (order[i] >= (int)order.size()) {
-            VSILOGW("Got incorrect index %d, max size is %lu", order[i], order.size());
+            NNRT_LOGW_PRINT("Got incorrect index %d, max size is %lu", order[i], order.size());
             assert(false);
         }
         new_operands[i] = operands[order[i]];
@@ -680,7 +681,7 @@ OperationPtr Armnn_Interpreter::map_MEAN(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
     NNAPI_CHECK_IO_NUM(operation, 3, 1);
-    std::shared_ptr<MeanOperation> mean = std::make_shared<MeanOperation>();
+    std::shared_ptr<ReduceMeanOperation> mean = std::make_shared<ReduceMeanOperation>();
     NNAPI_CHECK_PTR(mean);
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
     if (inputs[1]->isConst()) {
@@ -738,7 +739,7 @@ OperationPtr Armnn_Interpreter::map_SPACE_TO_BATCH_ND(Model* model,
             buffer, inputs[2]->size(), sp_to_bp->padFront.data(), sp_to_bp->padBack.data());
         sp_to_bp->setDataLayout(DataLayout(inputs[3]->scalar.int32));
     } else {
-        VSILOGW("Not support dynamic SPACE_TO_BATCH_ND.");
+        NNRT_LOGW_PRINT("Not support dynamic SPACE_TO_BATCH_ND.");
         assert(false);
     }
     truncateOperationIOs(model, operation, 1, 1);
@@ -767,12 +768,13 @@ OperationPtr Armnn_Interpreter::map_BATCH_TO_SPACE_ND(Model* model,
 OperationPtr Armnn_Interpreter::map_RESIZE_BILINEAR(Model* model,
                                                    OperationPtr operation,
                                                    uint32_t operation_index) {
-    NNAPI_CHECK_IO_NUM(operation, 3, 1);
+    NNAPI_CHECK_IO_NUM(operation, 4, 1);
     std::shared_ptr<ResizeBilinearOperation> resize = std::make_shared<ResizeBilinearOperation>();
     NNAPI_CHECK_PTR(resize);
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
     resize->outputHeight = inputs[1]->scalar.int32;
     resize->outputWidth = inputs[2]->scalar.int32;
+    resize->setDataLayout(DataLayout(inputs[3]->scalar.int32));
     truncateOperationIOs(model, operation, 1, 1);
     return resize;
 }
@@ -792,6 +794,12 @@ OperationPtr Armnn_Interpreter::map_LOCAL_RESPONSE_NORMALIZATION(Model* model,
     lrn->channelType = NormalizationAlgorithmChannel(inputs[5]->scalar.uint32);
     lrn->methodType = NormalizationAlgorithmMethod(inputs[6]->scalar.uint32);
     lrn->setDataLayout(DataLayout(inputs[7]->scalar.uint32));
+    // Set default axis = channel
+    if (DataLayout::NCHW == lrn->getDataLayout()) {
+        lrn->axis = 1;
+    } else {
+        lrn->axis = -1;
+    }
     truncateOperationIOs(model, operation, 1, 1);
     return lrn;
 }
@@ -829,7 +837,7 @@ OperationPtr Armnn_Interpreter::map_LSTM(Model* model,
 
     while (input_num < LstmUnitOperation::INPUT_COUNT) {
         operation->inputs().emplace_back(-1);
-        VSILOGD("Append Inputs at [%d]", input_num);
+        NNRT_LOGD_PRINT("Append Inputs at [%d]", input_num);
         ++input_num;
     }
 
@@ -882,7 +890,7 @@ OperationPtr Armnn_Interpreter::map_L2_POOL_2D(Model* model,
         pool->setDataLayout(DataLayout(inputs[10]->scalar.int32));
         pool->roundType = Rounding(inputs[11]->scalar.int32);
     } else {
-        VSILOGE("Number of input parameter not valid");
+        NNRT_LOGE_PRINT("Number of input parameter not valid");
         assert(false);
     }
     pool->setVxParam(OverflowPolicy::WRAP, RoundingPolicy::TO_ZERO, pool->roundType);
@@ -937,6 +945,12 @@ OperationPtr Armnn_Interpreter::map_L2_NORMALIZATION(Model* model,
 
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
     l2_norm->setDataLayout(DataLayout(inputs[1]->scalar.int32));
+    // Set default axis = channel
+    if (DataLayout::NCHW == l2_norm->getDataLayout()) {
+        l2_norm->axis = 1;
+    } else {
+        l2_norm->axis = -1;
+    }
     truncateOperationIOs(model, operation, 1, 1);
 
     return l2_norm;

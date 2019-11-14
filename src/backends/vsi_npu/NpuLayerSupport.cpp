@@ -463,12 +463,11 @@ bool NpuLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 
 bool NpuLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const {
-    std::array<DataType, 4> supportedTypes = {DataType::Float32,
-                                              DataType::Signed32,
-                                              DataType::QuantisedAsymm8,
-                                              DataType::QuantisedSymm16};
+    std::array<DataType, 3> supportedTypes = {DataType::Float32,
+                                              DataType::Float16,
+                                              DataType::QuantisedAsymm8};
 
-    return false && CheckSupportRule(TypeAnyOf(output, supportedTypes),
+    return CheckSupportRule(TypeAnyOf(output, supportedTypes),
                                      reasonIfUnsupported,
                                      "Npu constant: output is not a supported type.");
 }
@@ -1313,12 +1312,37 @@ bool NpuLayerSupport::IsReshapeSupported(const TensorInfo& input,
                             "Npu reshape: input type not supported.");
 }
 
+bool NpuLayerSupport::IsResizeSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        const ResizeDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+    std::array<DataType,3> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::QuantisedAsymm8,
+        DataType::Float16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference Resize: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference Resize: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference Resize: input and output types not matching");
+
+    return supported;
+}
+
 bool NpuLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 Optional<std::string&> reasonIfUnsupported) const {
-    bool supported = false;
+    bool supported = true;
     std::array<DataType, 3> supportedTypes = {
-        DataType::Float32, DataType::QuantisedAsymm8, DataType::QuantisedSymm16};
+        DataType::Float32, DataType::QuantisedAsymm8, DataType::Float16};
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes),
                                   reasonIfUnsupported,
