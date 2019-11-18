@@ -24,7 +24,11 @@ void CopyErrorMessage(char* truncatedString, const char* fullString, size_t maxL
 {
     if(truncatedString != nullptr)
     {
-        std::snprintf(truncatedString, maxLength, "%s", fullString);
+        size_t copyLength = std::min(maxLength-1, strlen(fullString));
+        std::memcpy(truncatedString, fullString, copyLength);
+
+        // Ensure null-terminated string.
+        truncatedString[copyLength] = '\0';
     }
 }
 
