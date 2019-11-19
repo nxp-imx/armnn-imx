@@ -14,7 +14,7 @@ if(BUILD_TF_LITE_PARSER)
     add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
-    set_target_properties(armnnTfLiteParser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnTfLiteParser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} VERSION ${GENERIC_LIB_VERSION})
     target_include_directories(armnnTfLiteParser PRIVATE ../armnn)
     target_include_directories(armnnTfLiteParser PRIVATE ../armnnUtils)
     target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")

@@ -89,7 +89,7 @@ if(BUILD_CAFFE_PARSER)
     endif()
 
     add_library_ex(armnnCaffeParser SHARED ${armnn_caffe_parser_sources})
-    set_target_properties(armnnCaffeParser PROPERTIES COMPILE_FLAGS "${CAFFE_PARSER_ADDITIONAL_COMPILE_FLAGS}" VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnCaffeParser PROPERTIES COMPILE_FLAGS "${CAFFE_PARSER_ADDITIONAL_COMPILE_FLAGS}" VERSION ${GENERIC_LIB_VERSION})
 
     target_include_directories(armnnCaffeParser PRIVATE src/armnnUtils)
 
@@ -120,7 +120,7 @@ if(BUILD_ONNX_PARSER)
 
     # Protobuf
     target_link_libraries(armnnOnnxParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnOnnxParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnOnnxParser PROPERTIES VERSION ${GENERIC_LIB_VERSION})
 endif()
 
 if(BUILD_TF_PARSER)
@@ -144,7 +144,7 @@ if(BUILD_TF_PARSER)
 
     # Protobuf (use the specific version tensorflow wants)
     target_link_libraries(armnnTfParser ${PROTOBUF_LIBRARIES})
-    set_target_properties(armnnTfParser PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+    set_target_properties(armnnTfParser PROPERTIES VERSION ${GENERIC_LIB_VERSION})
 endif()
 
 if(BUILD_ARMNN_QUANTIZER AND ARMNNREF)
@@ -491,7 +491,7 @@ if(PROFILING_BACKEND_STREAMLINE)
     target_link_libraries(armnn pthread)
 endif()
 
-set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
+set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION})
 
 if(BUILD_UNIT_TESTS)
     set(unittest_sources)
