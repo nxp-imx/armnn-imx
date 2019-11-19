@@ -38,9 +38,8 @@ class NpuTensorHandler : public ITensorHandle {
     NpuTensorHandler(const TensorInfo& info)
         : m_OperandId(0xFFFFFFFF),
           m_TensorInfo(info),
-          m_ReadOnlyMem(nullptr),
-          m_ReadOnlyMemSz(0),
-          m_Memory(nullptr){}
+          m_Memory(nullptr),
+          m_ExternalMem(nullptr){}
 
     ~NpuTensorHandler() {}
 
@@ -85,8 +84,12 @@ class NpuTensorHandler : public ITensorHandle {
     adaption::ModelStack& editModelStack() { return m_ModelStack; }
 
     void* data() {
-        assert(m_Memory);
-        return m_Memory.get();
+        if (m_ExternalMem) {
+            return m_ExternalMem;
+        } else {
+            assert(m_Memory);
+            return m_Memory.get();
+        }
     }
 
     unsigned int memSize() { return m_TensorInfo.GetNumBytes(); }
@@ -96,15 +99,6 @@ class NpuTensorHandler : public ITensorHandle {
     const bool IsOperandIdValid() const { return m_OperandId != m_InValidOperandId; }
 
     void SetOperandIdInValid() { m_OperandId = m_InValidOperandId; }
-
-    void SetMemoryAddr(const void* mem, unsigned int sz) {
-        m_ReadOnlyMem = mem;
-        m_ReadOnlyMemSz = sz;
-    }
-
-    const void* roMem() { return m_ReadOnlyMem; }
-
-    unsigned int roMemSz() { return m_ReadOnlyMemSz; }
 
     virtual bool Import(void* memory, MemorySource source) override;
 
@@ -130,16 +124,14 @@ class NpuTensorHandler : public ITensorHandle {
    private:
     uint32_t m_OperandId;
     TensorInfo m_TensorInfo;
-    const void* m_ReadOnlyMem;
-    unsigned int m_ReadOnlyMemSz;
     mutable boost::scoped_array<uint8_t> m_Memory;
+    void* m_ExternalMem;
 
     mutable adaption::ModelStack m_ModelStack;  //!< TensorHandler doesn't create this, we pass through
                                                 // the local model hosted by workload to following workload
                                                 // This help us make decesion to create final executable model
 
     mutable armnn::ModelShellPtr m_ModelShell;
-
     static constexpr uint32_t m_InValidOperandId{0xFFFFFFFF};
 };
 }

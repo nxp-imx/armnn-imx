@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <FloatingPointConverter.hpp>
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
@@ -31,43 +32,45 @@
 #include "TNpuWorkloads.hpp"
 
 namespace armnn {
+
 template <typename armnn::DataType... DataTypes>
-class NpuSpaceToBatchNdWorkload : public TNpuWorkload<SpaceToBatchNdQueueDescriptor, DataTypes...> {
+class NpuResizeWorkload : public TNpuWorkload<ResizeQueueDescriptor, DataTypes...> {
    public:
-    using base_type = TNpuWorkload<SpaceToBatchNdQueueDescriptor, DataTypes...>;
-    explicit NpuSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& descriptor,
-                                       const WorkloadInfo& info)
-        : TNpuWorkload<SpaceToBatchNdQueueDescriptor, DataTypes...>(descriptor, info),
-          m_BlockShape(descriptor.m_Parameters.m_BlockShape),
-          m_PadList(descriptor.m_Parameters.m_PadList),
+    explicit NpuResizeWorkload(const ResizeQueueDescriptor& descriptor, const WorkloadInfo& info)
+        : TNpuWorkload<ResizeQueueDescriptor, DataTypes...>(descriptor, info),
+          m_TargetWidth(descriptor.m_Parameters.m_TargetWidth),
+          m_TargetHeight(descriptor.m_Parameters.m_TargetHeight),
+          m_Method(descriptor.m_Parameters.m_Method),
           m_DataLayout(descriptor.m_Parameters.m_DataLayout) {
-        // Add input operand
-        // Only 1 input
+        // Add inputs operand
         std::vector<uint32_t> inOperandIds;
+
+        // order is important
+        // ONLY 1 input
+        assert(1 == descriptor.m_Inputs.size());
         NpuTensorHandler* inputTensorHandle =
             dynamic_cast<NpuTensorHandler*>(descriptor.m_Inputs[0]);
         uint32_t inputOperandId = this->AddOperandAndSetValue(
             inputTensorHandle->GetTensorInfo(), inputTensorHandle->GetShape(), nullptr);
         inOperandIds.push_back(inputOperandId);
 
-        // Add block shape operand
-        TensorShape blockShape({(uint32_t)m_BlockShape.size()});
-        TensorInfo blockInfo(blockShape, DataType::Signed32);
-        inOperandIds.push_back(
-            this->AddOperandAndSetValue(blockInfo, blockShape, m_BlockShape.data()));
+        // Set target height and width
+        NpuTensorHandler* outputTensorHandle =
+            dynamic_cast<NpuTensorHandler*>(descriptor.m_Outputs[0]);
+        auto outShape = outputTensorHandle->GetShape();
+        if (m_DataLayout == armnn::DataLayout::NCHW) {
+            m_TargetHeight = outShape[2];
+            m_TargetWidth = outShape[3];
+        } else if (m_DataLayout == armnn::DataLayout::NHWC) {
+            m_TargetHeight = outShape[1];
+            m_TargetWidth = outShape[2];
+        }
 
-        // Add pad list operand
-        TensorShape padListShape({2, 2});
-        TensorInfo padListInfo(padListShape, DataType::Signed32);
+        // Add target height operand
+        inOperandIds.push_back(this->AddOperandAndSetValue(m_TargetHeight));
 
-        m_Pad.push_back(m_PadList[0].first);
-        m_Pad.push_back(m_PadList[0].second);
-
-        m_Pad.push_back(m_PadList[1].first);
-        m_Pad.push_back(m_PadList[1].second);
-
-        inOperandIds.push_back(
-            this->AddOperandAndSetValue(padListInfo, padListShape, m_Pad.data()));
+        // Add target width operand
+        inOperandIds.push_back(this->AddOperandAndSetValue(m_TargetWidth));
 
         // Add layout operand
         int32_t layoutCode = m_DataLayout == armnn::DataLayout::NCHW
@@ -75,32 +78,33 @@ class NpuSpaceToBatchNdWorkload : public TNpuWorkload<SpaceToBatchNdQueueDescrip
                                  : int32_t(nnrt::DataLayout::NHWC);
         inOperandIds.push_back(this->AddOperandAndSetValue(layoutCode));
 
-        // Add output operand
         std::vector<uint32_t> outOperandIds;
-        NpuTensorHandler* outputTensorHandle =
-            dynamic_cast<NpuTensorHandler*>(descriptor.m_Outputs[0]);
         uint32_t outputTensorId = this->AddOperandAndSetValue(
             outputTensorHandle->GetTensorInfo(), outputTensorHandle->GetShape(), nullptr);
         outOperandIds.push_back(outputTensorId);
 
-        this->AddOperation(nnrt::OperationType::SPACE_TO_BATCH_ND,
-                           inOperandIds.size(),
-                           inOperandIds.data(),
-                           outOperandIds.size(),
-                           outOperandIds.data());
+        if (m_Method == armnn::ResizeMethod::Bilinear) {
+            this->AddOperation(nnrt::OperationType::RESIZE_BILINEAR,
+                               inOperandIds.size(),
+                               inOperandIds.data(),
+                               outOperandIds.size(),
+                               outOperandIds.data());
+        } else if (m_Method == armnn::ResizeMethod::NearestNeighbor) {
+            this->AddOperation(nnrt::OperationType::RESIZE_NEAREST_NEIGHBOR,
+                               inOperandIds.size(),
+                               inOperandIds.data(),
+                               outOperandIds.size(),
+                               outOperandIds.data());
+        }
     }
 
    private:
-    // Block shape value.
-    std::vector<unsigned int> m_BlockShape;
-    // Specifies the padding values for the input dimension:
-    /// heightPad{top, bottom} widthPad{left, right}.
-    std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
-    std::vector<unsigned int> m_Pad;
-    // The data layout to be used (NCHW, NHWC).
-    DataLayout m_DataLayout;
+    uint32_t m_TargetWidth;
+    uint32_t m_TargetHeight;
+    armnn::ResizeMethod m_Method;
+    armnn::DataLayout m_DataLayout;
 };
-using NpuSpaceToBatchNDFloat32Workload = NpuSpaceToBatchNdWorkload<armnn::DataType::Float32>;
-using NpuSpaceToBatchNDFloat16Workload = NpuSpaceToBatchNdWorkload<armnn::DataType::Float16>;
-using NpuSpaceToBatchNDUint8Workload = NpuSpaceToBatchNdWorkload<armnn::DataType::QuantisedAsymm8>;
+using NpuResizeFloat32Workload = NpuResizeWorkload<armnn::DataType::Float32>;
+using NpuResizeFloat16Workload = NpuResizeWorkload<armnn::DataType::Float16>;
+using NpuResizeUint8Workload = NpuResizeWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

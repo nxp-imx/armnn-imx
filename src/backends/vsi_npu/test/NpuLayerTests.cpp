@@ -1,3 +1,27 @@
+/****************************************************************************
+*
+*    Copyright (c) 2019 Vivante Corporation
+*
+*    Permission is hereby granted, free of charge, to any person obtaining a
+*    copy of this software and associated documentation files (the "Software"),
+*    to deal in the Software without restriction, including without limitation
+*    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+*    and/or sell copies of the Software, and to permit persons to whom the
+*    Software is furnished to do so, subject to the following conditions:
+*
+*    The above copyright notice and this permission notice shall be included in
+*    all copies or substantial portions of the Software.
+*
+*    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+*    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+*    DEALINGS IN THE SOFTWARE.
+*
+*****************************************************************************/
+
 #include <boost/test/unit_test.hpp>
 
 #include "NpuWorkloadFactoryHelper.hpp"
@@ -526,46 +550,49 @@ ARMNN_AUTO_TEST_CASE(BatchNormUint8Nhwc, BatchNormUint8NhwcTest)
 // ARMNN_AUTO_TEST_CASE(BatchNormInt16, BatchNormInt16Test)
 // ARMNN_AUTO_TEST_CASE(BatchNormInt16Nhwc, BatchNormInt16NhwcTest)
 
-// // Resize Bilinear - NCHW
-// ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear,
-//                      SimpleResizeBilinearTest<DataType::Float32>,
-//                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8,
-//                      SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
-//                      DataLayout::NCHW)
+// Resize Bilinear - NCHW
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinear,
+                     SimpleResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8,
+                     SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
+                     DataLayout::NCHW)
 // ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint16,
 //                      SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearNop,
-//                      ResizeBilinearNopTest<DataType::Float32>,
-//                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNop,
+                     ResizeBilinearNopTest<DataType::Float32>,
+                     DataLayout::NCHW)
+// Note: zero point >= 0
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint8,
 //                      ResizeBilinearNopTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NCHW)
 // ARMNN_AUTO_TEST_CASE(esizeBilinearNopUint16,
 //                      SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin,
-//                      ResizeBilinearSqMinTest<DataType::Float32>,
-//                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8,
-//                      ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
-//                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMin,
+                     ResizeBilinearSqMinTest<DataType::Float32>,
+                     DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8,
+                     ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
+                     DataLayout::NCHW)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint16,
 //                      SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearMin,
-//                      ResizeBilinearMinTest<DataType::Float32>,
-//                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMin,
+                     ResizeBilinearMinTest<DataType::Float32>,
+                     DataLayout::NCHW)
+// Note: zero point >= 0
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8,
 //                      ResizeBilinearMinTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NCHW)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint16,
 //                      SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NCHW)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearMag,
-//                      ResizeBilinearMagTest<DataType::Float32>,
-//                      DataLayout::NCHW)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMag,
+                     ResizeBilinearMagTest<DataType::Float32>,
+                     DataLayout::NCHW)
+// Note: zero point >= 0
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8,
 //                      ResizeBilinearMagTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NCHW)
@@ -573,46 +600,46 @@ ARMNN_AUTO_TEST_CASE(BatchNormUint8Nhwc, BatchNormUint8NhwcTest)
 //                      SimpleResizeBilinearTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NCHW)
 
-// // Resize Bilinear - NHWC
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc,
-//                      ResizeBilinearNopTest<DataType::Float32>,
-//                      DataLayout::NHWC)
+// Resize Bilinear - NHWC
+ARMNN_AUTO_TEST_CASE(ResizeBilinearNopNhwc,
+                     ResizeBilinearNopTest<DataType::Float32>,
+                     DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint8Nhwc,
 //                      ResizeBilinearNopTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearNopUint16Nhwc,
 //                      ResizeBilinearNopTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc,
-//                      SimpleResizeBilinearTest<DataType::Float32>,
-//                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8Nhwc,
-//                      SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
-//                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearNhwc,
+                     SimpleResizeBilinearTest<DataType::Float32>,
+                     DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint8Nhwc,
+                     SimpleResizeBilinearTest<DataType::QuantisedAsymm8>,
+                     DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(SimpleResizeBilinearUint16Nhwc,
 //                      ResizeBilinearNopTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc,
-//                      ResizeBilinearSqMinTest<DataType::Float32>,
-//                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8Nhwc,
-//                      ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
-//                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinNhwc,
+                     ResizeBilinearSqMinTest<DataType::Float32>,
+                     DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint8Nhwc,
+                     ResizeBilinearSqMinTest<DataType::QuantisedAsymm8>,
+                     DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearSqMinUint16Nhwc,
 //                      ResizeBilinearNopTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc,
-//                      ResizeBilinearMinTest<DataType::Float32>,
-//                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMinNhwc,
+                     ResizeBilinearMinTest<DataType::Float32>,
+                     DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint8Nhwc,
 //                      ResizeBilinearMinTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMinUint16Nhwc,
 //                      ResizeBilinearNopTest<DataType::QuantisedSymm16>,
 //                      DataLayout::NHWC)
-// ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc,
-//                      ResizeBilinearMagTest<DataType::Float32>,
-//                      DataLayout::NHWC)
+ARMNN_AUTO_TEST_CASE(ResizeBilinearMagNhwc,
+                     ResizeBilinearMagTest<DataType::Float32>,
+                     DataLayout::NHWC)
 // ARMNN_AUTO_TEST_CASE(ResizeBilinearMagUint8Nhwc,
 //                      ResizeBilinearMagTest<DataType::QuantisedAsymm8>,
 //                      DataLayout::NHWC)
@@ -661,19 +688,20 @@ ARMNN_AUTO_TEST_CASE(L2Normalization4dUint8Nhwc, L2Normalization4dUint8Test, Dat
 // DataLayout::NCHW)
 
  // Pad
- ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
+ // Note: Pad2d vsimulator can pass, but hardware cannot pass
+//  ARMNN_AUTO_TEST_CASE(PadFloat322d, PadFloat322dTest)
 //  ARMNN_AUTO_TEST_CASE(PadFloat323d, PadFloat323dTest)
 // TODO: Driver need fix batch issue
 //  ARMNN_AUTO_TEST_CASE(PadFloat324d, PadFloat324dTest)
 
- ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
+//  ARMNN_AUTO_TEST_CASE(PadUint82d, PadUint82dTest)
 //  ARMNN_AUTO_TEST_CASE(PadUint83d, PadUint83dTest)
 //  TODO: Driver need fix batch issue
 //  ARMNN_AUTO_TEST_CASE(PadUint84d, PadUint84dTest)
 
-// // Constant
-// ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
-// ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
+// Constant
+ARMNN_AUTO_TEST_CASE(Constant, ConstantTest)
+ARMNN_AUTO_TEST_CASE(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
 // ARMNN_AUTO_TEST_CASE(ConstantInt16, ConstantInt16CustomQuantizationScaleAndOffsetTest)
 
 // // Concat

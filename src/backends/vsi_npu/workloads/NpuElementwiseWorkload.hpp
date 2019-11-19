@@ -59,31 +59,43 @@ class NpuElementwiseWorkload : public TNpuWorkload<ParentDescriptor, DataTypes..
 };
 using NpuAdditionFloat32Workload = NpuElementwiseWorkload<AdditionQueueDescriptor,
       nnrt::OperationType::ADD, armnn::DataType::Float32>;
+using NpuAdditionFloat16Workload = NpuElementwiseWorkload<AdditionQueueDescriptor,
+      nnrt::OperationType::ADD, armnn::DataType::Float16>;
 using NpuAdditionUint8Workload = NpuElementwiseWorkload<AdditionQueueDescriptor,
       nnrt::OperationType::ADD, armnn::DataType::QuantisedAsymm8>;
 
 using NpuMinimumFloat32Workload = NpuElementwiseWorkload<MinimumQueueDescriptor,
       nnrt::OperationType::MINIMUM, armnn::DataType::Float32>;
+using NpuMinimumFloat16Workload = NpuElementwiseWorkload<MinimumQueueDescriptor,
+      nnrt::OperationType::MINIMUM, armnn::DataType::Float16>;
 using NpuMinimumUint8Workload = NpuElementwiseWorkload<MinimumQueueDescriptor,
       nnrt::OperationType::MINIMUM, armnn::DataType::QuantisedAsymm8>;
 
 using NpuMaximumFloat32Workload = NpuElementwiseWorkload<MaximumQueueDescriptor,
       nnrt::OperationType::MAXIMUM, armnn::DataType::Float32>;
+using NpuMaximumFloat16Workload = NpuElementwiseWorkload<MaximumQueueDescriptor,
+      nnrt::OperationType::MAXIMUM, armnn::DataType::Float16>;
 using NpuMaximumUint8Workload = NpuElementwiseWorkload<MaximumQueueDescriptor,
       nnrt::OperationType::MAXIMUM, armnn::DataType::QuantisedAsymm8>;
 
 using NpuSubtractionFloat32Workload = NpuElementwiseWorkload<SubtractionQueueDescriptor,
       nnrt::OperationType::SUB, armnn::DataType::Float32>;
+using NpuSubtractionFloat16Workload = NpuElementwiseWorkload<SubtractionQueueDescriptor,
+      nnrt::OperationType::SUB, armnn::DataType::Float16>;
 using NpuSubtractionUint8Workload = NpuElementwiseWorkload<SubtractionQueueDescriptor,
       nnrt::OperationType::SUB, armnn::DataType::QuantisedAsymm8>;
 
 using NpuDivisionFloat32Workload = NpuElementwiseWorkload<DivisionQueueDescriptor,
       nnrt::OperationType::DIV, armnn::DataType::Float32>;
+using NpuDivisionFloat16Workload = NpuElementwiseWorkload<DivisionQueueDescriptor,
+      nnrt::OperationType::DIV, armnn::DataType::Float16>;
 using NpuDivisionUint8Workload = NpuElementwiseWorkload<DivisionQueueDescriptor,
       nnrt::OperationType::DIV, armnn::DataType::QuantisedAsymm8>;
 
 using NpuMultiplicationFloat32Workload = NpuElementwiseWorkload<MultiplicationQueueDescriptor,
       nnrt::OperationType::MUL, armnn::DataType::Float32>;
+using NpuMultiplicationFloat16Workload = NpuElementwiseWorkload<MultiplicationQueueDescriptor,
+      nnrt::OperationType::MUL, armnn::DataType::Float16>;
 using NpuMultiplicationUint8Workload = NpuElementwiseWorkload<MultiplicationQueueDescriptor,
       nnrt::OperationType::MUL, armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

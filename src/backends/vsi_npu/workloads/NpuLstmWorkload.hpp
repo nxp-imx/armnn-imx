@@ -100,5 +100,6 @@ class NpuLstmWorkload : public TNpuWorkload<LstmQueueDescriptor, DataTypes...> {
     float m_ClippingThresProj;
 };
 using NpuLstmFloat32Workload = NpuLstmWorkload<armnn::DataType::Float32>;
+using NpuLstmFloat16Workload = NpuLstmWorkload<armnn::DataType::Float16>;
 using NpuLstmUint8Workload = NpuLstmWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

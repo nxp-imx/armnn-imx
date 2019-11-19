@@ -214,7 +214,7 @@ namespace armnn {
 ModelShell::ModelShell(adaption::FinalModelPtr&& finalModel)
     : m_NativeModel(std::forward<adaption::FinalModelPtr&&>(finalModel)) {
     m_Compiler = std::make_unique<nnrt::Compilation>(m_NativeModel->first.get());
-    m_Compiler->setInterpreter(new armnn::NnApiInterpreter());
+    m_Compiler->setInterpreter(new armnn::Armnn_Interpreter());
     m_ExecutionPtr = std::make_unique<nnrt::Execution>(m_Compiler.get());
 }
 
@@ -226,9 +226,7 @@ ModelShell::~ModelShell() {
 void ModelShell::Execute() {
     auto idx = 0;
     for (auto& input : m_NativeModel->second.first) {
-        const void* inputBufAddress = input->roMem() == nullptr ? input->data() : input->roMem();
-        uint32_t inputBufSz = input->roMem() == nullptr ? input->memSize() : input->roMemSz();
-        m_ExecutionPtr->setInput(idx, nullptr, inputBufAddress, inputBufSz);
+        m_ExecutionPtr->setInput(idx, nullptr, input->data(), input->memSize());
         ++idx;
     }
 
@@ -239,11 +237,15 @@ void ModelShell::Execute() {
     }
 
     auto event = std::make_shared<nnrt::Event>();
+
+    // Disable nnrt do fp32tofp16, for armnn support fp16-turbo-mode
+    m_NativeModel->first->relax(false);
+
     auto errCode = m_ExecutionPtr->startCompute(event);
 
     if (0 != errCode){
         assert(false);
-        VSILOGE("Start Compute returen error =%d", errCode);
+        VSILOGE("Start Compute return error =%d", errCode);
     }else {
         event->wait();
     }

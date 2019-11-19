@@ -7,11 +7,8 @@ list(APPEND armnnNpuBackendUnitTests_sources
     NpuWorkloadFactoryHelper.hpp
     NpuLayerTests.cpp
     NpuCreateWorkloadTests.cpp
-    #NpuDetectionPostProcessTests.cpp
     NpuEndToEndTests.cpp
-    #NpuJsonPrinterTests.cpp
-    #NpuLayerSupportTests.cpp
-    #NpuOptimizedNetworkTests.cpp
+    NpuLayerSupportTests.cpp
     #NpuRuntimeTests.cpp
 )
 

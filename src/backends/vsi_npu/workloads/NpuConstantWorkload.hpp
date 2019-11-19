@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
 *
@@ -24,19 +24,30 @@
 
 #pragma once
 
+#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
-#include <backendsCommon/MemCopyWorkload.hpp>
+#include <boost/log/trivial.hpp>
+#include "TNpuWorkloads.hpp"
 
-namespace armnn
-{
+namespace armnn {
+template <typename armnn::DataType... DataTypes>
+class NpuConstantWorkload : public TNpuWorkload<ConstantQueueDescriptor, DataTypes...> {
+   public:
+    using base_type = TNpuWorkload<ConstantQueueDescriptor, DataTypes...>;
+    explicit NpuConstantWorkload(const ConstantQueueDescriptor& descriptor,
+                                 const WorkloadInfo& info)
+        : TNpuWorkload<ConstantQueueDescriptor, DataTypes...>(descriptor, info),
+          m_LayerOutput(std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_LayerOutput))) {
+        descriptor.m_Outputs[0]->Import(m_LayerOutput->GetTensor<void>(), MemorySource::Malloc);
+    }
 
-class NpuOutputWorkload : public CopyMemGenericWorkload
-{
-public:
-    explicit NpuOutputWorkload(const OutputQueueDescriptor& descriptor,
-                                                  const WorkloadInfo& info);
-    virtual void Execute() const override;
+    virtual void Execute() const {}
+
+   private:
+    std::unique_ptr<ScopedCpuTensorHandle> m_LayerOutput;
 };
-
-} //namespace armnn
+using NpuConstantFloat32Workload = NpuConstantWorkload<armnn::DataType::Float32>;
+using NpuConstantFloat16Workload = NpuConstantWorkload<armnn::DataType::Float16>;
+using NpuConstantUint8Workload = NpuConstantWorkload<armnn::DataType::QuantisedAsymm8>;
+}  // namespace armnn

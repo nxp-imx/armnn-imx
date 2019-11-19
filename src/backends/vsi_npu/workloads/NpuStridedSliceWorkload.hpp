@@ -83,5 +83,6 @@ class NpuStridedSliceWorkload : public TNpuWorkload<StridedSliceQueueDescriptor,
 
 };
 using NpuStridedSliceFloat32Workload = NpuStridedSliceWorkload<armnn::DataType::Float32>;
+using NpuStridedSliceFloat16Workload = NpuStridedSliceWorkload<armnn::DataType::Float16>;
 using NpuStridedSliceUint8Workload = NpuStridedSliceWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

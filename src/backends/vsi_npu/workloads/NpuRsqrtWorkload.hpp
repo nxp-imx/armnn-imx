@@ -46,5 +46,6 @@ class NpuRsqrtWorkload : public TNpuWorkload<RsqrtQueueDescriptor, DataTypes...>
     }
 };
 using NpuRsqrtFloat32Workload = NpuRsqrtWorkload<armnn::DataType::Float32>;
+using NpuRsqrtFloat16Workload = NpuRsqrtWorkload<armnn::DataType::Float16>;
 using NpuRsqrtUint8Workload = NpuRsqrtWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

@@ -27,6 +27,7 @@
 #include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
+#include <FloatingPointConverter.hpp>
 #include <boost/log/trivial.hpp>
 #include "TNpuWorkloads.hpp"
 #include "Permute.hpp"
@@ -81,6 +82,8 @@ class NpuDepthWiseConvolution2dWorkload
             uint32_t dataTypeSize = 4;
             if (weightInfo.GetDataType() == DataType::QuantisedAsymm8) {
                 dataTypeSize = 1;
+            } else if (weightInfo.GetDataType() == DataType::Float16) {
+                dataTypeSize = 2;
             }
             m_KernelData.reset(new uint8_t[weightInfo.GetNumBytes()]);
             armnnUtils::Permute(
@@ -94,10 +97,19 @@ class NpuDepthWiseConvolution2dWorkload
 
         // Add bias operand
         if (m_Bias) {
-            const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
+            TensorInfo biasInfo = m_Bias->GetTensorInfo();
             const TensorShape biasShape = m_Bias->GetShape();
-            inOperandIds.push_back(
-                this->AddOperandAndSetValue(biasInfo, biasShape, m_Bias->GetTensor<void>()));
+            if (biasInfo.GetDataType() == DataType::Float16) {
+                biasInfo.SetDataType(DataType::Float32);
+                m_Fp32BiasData.reset(new float[biasInfo.GetNumElements()]);
+                armnnUtils::FloatingPointConverter::ConvertFloat16To32(
+                    m_Bias->GetTensor<Half>(), biasInfo.GetNumElements(), m_Fp32BiasData.get());
+                inOperandIds.push_back(
+                    this->AddOperandAndSetValue(biasInfo, biasShape, m_Fp32BiasData.get()));
+            } else {
+                inOperandIds.push_back(
+                    this->AddOperandAndSetValue(biasInfo, biasShape, m_Bias->GetTensor<void>()));
+            }
         } else {
             TensorShape biasShape(1);
             TensorInfo biasInfo(biasShape, FakeBias::value);
@@ -188,8 +200,10 @@ class NpuDepthWiseConvolution2dWorkload
     mutable boost::scoped_array<uint8_t> m_KernelData;
 
     std::vector<typename FakeBias::type> m_FakeBiasData;  //!< workaround: bias required by shader
+    mutable boost::scoped_array<float> m_Fp32BiasData;
 };
 using NpuDepthWiseConvolution2dFloat32Workload = NpuDepthWiseConvolution2dWorkload<armnn::DataType::Float32>;
+using NpuDepthWiseConvolution2dFloat16Workload = NpuDepthWiseConvolution2dWorkload<armnn::DataType::Float16>;
 using NpuDepthWiseConvolution2dUint8Workload =
     NpuDepthWiseConvolution2dWorkload<armnn::DataType::QuantisedAsymm8>;
 }  // namespace armnn

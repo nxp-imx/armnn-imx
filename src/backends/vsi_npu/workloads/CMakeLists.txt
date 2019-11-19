@@ -32,13 +32,9 @@ list(APPEND armnnNpuBackendWorkloads_sources
     NpuDepthWiseConvolution2dWorkload.hpp
     NpuElementwiseWorkload.hpp
     NpuFullyConnectedWorkload.hpp
-    NpuInputWorkload.cpp
-    NpuInputWorkload.hpp
     NpuL2NormalizationWorkload.hpp
     NpuLstmWorkload.hpp
     NpuMeanWorkload.hpp
-    NpuOutputWorkload.cpp
-    NpuOutputWorkload.hpp
     NpuPadWorkload.hpp
     NpuPermuteWorkload.hpp
     NpuPooling2dWorkload.hpp
