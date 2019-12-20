@@ -77,22 +77,6 @@ if(BUILD_CAFFE_PARSER)
         ../ImagePreprocessor.cpp)
     CaffeParserTest(VSI-CaffeInceptionV3-Armnn "${VSI-CaffeInceptionV3-Armnn_sources}")
 
-    set(VSI-CaffeInceptionV4-Armnn_sources
-        CaffeInceptionV4-Armnn.cpp
-        ../CaffePreprocessor.hpp
-        ../CaffePreprocessor.cpp
-        ../ImagePreprocessor.hpp
-        ../ImagePreprocessor.cpp)
-    CaffeParserTest(VSI-CaffeInceptionV4-Armnn "${VSI-CaffeInceptionV4-Armnn_sources}")
-
-    set(VSI-CaffeMobilenetV1-Armnn_sources
-        CaffeMobilenetV1-Armnn.cpp
-        ../CaffePreprocessor.hpp
-        ../CaffePreprocessor.cpp
-        ../ImagePreprocessor.hpp
-        ../ImagePreprocessor.cpp)
-    CaffeParserTest(VSI-CaffeMobilenetV1-Armnn "${VSI-CaffeMobilenetV1-Armnn_sources}")
-
     set(VSI-CaffeMobilenetV2-Armnn_sources
         CaffeMobilenetV2-Armnn.cpp
         ../CaffePreprocessor.hpp
