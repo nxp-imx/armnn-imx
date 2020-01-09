@@ -25,17 +25,6 @@
 # UnitTests
 include(CheckIncludeFiles)
 
-# Setup the inference test framework
-set(inference_test_sources
-    ../ClassifierTestCaseData.hpp
-    ../InferenceModel.hpp
-    ../InferenceTest.hpp
-    ../InferenceTest.inl
-    ../InferenceTest.cpp
-    ../InferenceTestImage.hpp
-    ../InferenceTestImage.cpp)
-
-add_library_ex(inferenceTest STATIC ${inference_test_sources})
 target_include_directories(inferenceTest PRIVATE ../../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../../src/backends)
 target_include_directories(inferenceTest PRIVATE ../../third-party/stb)
@@ -278,13 +267,13 @@ if (BUILD_TF_LITE_PARSER)
         TfLiteInceptionV2Quantized-Armnn.cpp
         ../ImagePreprocessor.hpp
         ../ImagePreprocessor.cpp)
-    TfLiteParserTest(TfLiteInceptionV2Quantized-Armnn "${TfLiteInceptionV2Quantized-Armnn-VSI_sources}")
+    TfLiteParserTest(TfLiteInceptionV2Quantized-Armnn-VSI "${TfLiteInceptionV2Quantized-Armnn-VSI_sources}")
 
     set(TfLiteInceptionV3Quantized-Armnn-VSI_sources
         TfLiteInceptionV3Quantized-Armnn.cpp
         ../ImagePreprocessor.hpp
         ../ImagePreprocessor.cpp)
-    TfLiteParserTest(TfLiteInceptionV3Quantized-Armnn "${TfLiteInceptionV3Quantized-Armnn-VSI_sources}")
+    TfLiteParserTest(TfLiteInceptionV3Quantized-Armnn-VSI "${TfLiteInceptionV3Quantized-Armnn-VSI_sources}")
 
     set(TfLiteInceptionV3Float-Armnn-VSI_sources
         TfLiteInceptionV3Float-Armnn.cpp
