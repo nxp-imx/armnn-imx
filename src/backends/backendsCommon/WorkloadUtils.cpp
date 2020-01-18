@@ -86,17 +86,12 @@ ConstTensor ReorderWeightChannelsForAcl(const ConstTensor& weightHandle, DataLay
     unsigned int destinationWeightsChannel;
     unsigned int totalChannels = inputChannels * multiplier;
     unsigned int channelSize   = height * width;
+    unsigned int inputChannel  = 0;
 
     for (unsigned int originWeightsChannel = 0; originWeightsChannel < totalChannels; originWeightsChannel++)
     {
-        if (originWeightsChannel % inputChannels == 0)
-        {
-            destinationWeightsChannel = originWeightsChannel / inputChannels;
-        }
-        else
-        {
-            destinationWeightsChannel = (originWeightsChannel - 1) / inputChannels + multiplier;
-        }
+        inputChannel = originWeightsChannel % inputChannels;
+        destinationWeightsChannel = (originWeightsChannel - inputChannel) / inputChannels + multiplier * inputChannel;
 
         for (unsigned int i = 0; i < channelSize; i++)
         {
@@ -182,6 +177,20 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstCpuTensorHandle*
 
     // 3. Return both the tensor and the allocated storage to ensure that the data stays alive
     return weightPermuted;
+}
+
+int32_t ConvertMaskToACLFormat(int32_t mask, int32_t numDim)
+{
+    int32_t reversedMask = 0;
+    for (unsigned int i = 0; i < boost::numeric_cast<unsigned int>(numDim); ++i)
+    {
+        // Check if bit set in mask for each dimension
+        int32_t bit = (mask & 1 << i) != 0;
+        // Increment the new mask with the bits reversed
+        reversedMask += (bit << std::max(numDim-(boost::numeric_cast<int>(i)+1), 0));
+    }
+
+    return reversedMask;
 }
 
 } // namespace armnn
