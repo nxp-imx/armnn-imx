@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -1296,15 +1297,16 @@ bool NpuLayerSupport::IsQuantizeSupported(const TensorInfo& input,
 }
 
 bool NpuLayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
                                          const ReshapeDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(output);
     ignore_unused(descriptor);
     // Define supported output types.
     std::array<DataType, 3> supportedOutputTypes = {
         DataType::Float32,
         DataType::Float16,
         DataType::QuantisedAsymm8,
-        // DataType::QuantisedSymm16
     };
 
     return CheckSupportRule(TypeAnyOf(input, supportedOutputTypes),

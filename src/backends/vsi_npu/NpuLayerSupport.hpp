@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -249,6 +250,7 @@ public:
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsReshapeSupported(const TensorInfo& input,
+                            const TensorInfo& output,
                             const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
