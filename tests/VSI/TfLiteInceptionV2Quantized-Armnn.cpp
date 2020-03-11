@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
                      "inception_v2_quant.tflite",         // model name
                      true,                                // model is binary
                      "input",                             // input tensor name
-                     "output",                            // output tensor name
+                     "InceptionV2/Predictions/Reshape_1", // output tensor name
                      { 0, 1, 2 },                         // test images to test with as above
                      [&imageSet](const char* dataDir, const ModelType & model) {
                          // we need to get the input quantization parameters from

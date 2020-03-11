@@ -122,6 +122,9 @@ Armnn_Interpreter::Armnn_Interpreter() {
     REGISTER_OP(PRELU);
     REGISTER_OP(DECONV_2D);
     REGISTER_OP(DATA_CONVERT);
+    REGISTER_OP(GREATER);
+    REGISTER_OP(EQUAL);
+    REGISTER_OP(SPLIT);
 
 /*customer Op*/
 // REGISTER_OP(VSI_RESIZE_NEAREST);
@@ -773,7 +776,7 @@ OperationPtr Armnn_Interpreter::map_RNN(Model* model,
     auto inputs = model->getOperands(operation->inputs());
 
     // RNN's activation is NeuralNetwork::FuseType
-    rnn->activation = inputs[5]->scalar.int32;
+    rnn->activation = FusedType(inputs[5]->scalar.int32);
     truncateOperationIOs(model, operation, 5, 2);
     return rnn;
 }
@@ -948,6 +951,21 @@ OperationPtr Armnn_Interpreter::map_LEAKY_RELU(Model* model,
     return leaky_relu;
 }
 
+OperationPtr Armnn_Interpreter::map_SPLIT(Model* model,
+                                          OperationPtr operation,
+                                          uint32_t operation_index) {
+    std::shared_ptr<SplitOperation> op = std::make_shared<SplitOperation>();
+    NNAPI_CHECK_PTR(op);
+    std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
+    op->axis = inputs[1]->scalar.int32;
+    op->split_number = inputs[2]->scalar.int32;
+    int32_t* slices = model->getBuffer<int32_t>(inputs[3]->weak_mem_ref.lock());
+    op->slices.resize(op->split_number);
+    memcpy(op->slices.data(), slices, sizeof(int32_t) * op->split_number);
+    truncateOperationIOs(model, operation, 1, operation->outputs().size());
+    return op;
+}
+
 DECLARE_SAMPLE_OP(RELU1, 1, 1, Relu1Operation)
 DECLARE_SAMPLE_OP(RELU6, 1, 1, Relu6Operation)
 DECLARE_SAMPLE_OP(ABS, 1, 1, AbsOperation)
@@ -964,4 +982,6 @@ DECLARE_SAMPLE_OP(MINIMUM, 2, 1, MinimumOperation)
 DECLARE_SAMPLE_OP(RSQRT, 1, 1, RSqrtOperation)
 DECLARE_SAMPLE_OP(PRELU, 2, 1, PReluOperation)
 DECLARE_SAMPLE_OP(DATA_CONVERT, 1, 1, DataConvertOperation)
+DECLARE_SAMPLE_OP(GREATER, 2, 1, GreaterOperation)
+DECLARE_SAMPLE_OP(EQUAL, 2, 1, EqualOperation)
 }

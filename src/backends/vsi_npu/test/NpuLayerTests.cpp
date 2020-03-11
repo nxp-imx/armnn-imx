@@ -431,13 +431,13 @@ ARMNN_AUTO_TEST_CASE(UnbiasSimpleFullyConnectedWithTranspose, FullyConnectedFloa
 // ARMNN_AUTO_TEST_CASE(FullyConnectedLarge, FullyConnectedLargeTest, false)
 // ARMNN_AUTO_TEST_CASE(FullyConnectedLargeTransposed, FullyConnectedLargeTest, true)
 
-// // Splitter
-// ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
-// ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
+// Splitter
+ARMNN_AUTO_TEST_CASE(SimpleSplitter, SplitterTest)
+ARMNN_AUTO_TEST_CASE(SimpleSplitterUint8, SplitterUint8Test)
 // ARMNN_AUTO_TEST_CASE(SimpleSplitterInt16, SplitterInt16Test)
 
-// ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
-// ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
+ARMNN_AUTO_TEST_CASE(CopyViaSplitter, CopyViaSplitterTest)
+ARMNN_AUTO_TEST_CASE(CopyViaSplitterUint8, CopyViaSplitterUint8Test)
 // ARMNN_AUTO_TEST_CASE(CopyViaSplitterInt16, CopyViaSplitterInt16Test)
 
 // // Concat
@@ -493,20 +493,20 @@ ARMNN_AUTO_TEST_CASE(AddBroadcast1ElementUint8, AdditionBroadcast1ElementUint8Te
 // ARMNN_AUTO_TEST_CASE(DivisionInt16Broadcast1DVector, DivisionBroadcast1DVectorInt16Test)
 
 // // Equal
-// ARMNN_AUTO_TEST_CASE(SimpleEqual, EqualSimpleTest)
-// ARMNN_AUTO_TEST_CASE(EqualBroadcast1Element, EqualBroadcast1ElementTest)
-// ARMNN_AUTO_TEST_CASE(EqualBroadcast1DVector, EqualBroadcast1DVectorTest)
-// ARMNN_AUTO_TEST_CASE(EqualUint8, EqualUint8Test)
-// ARMNN_AUTO_TEST_CASE(EqualBroadcast1ElementUint8, EqualBroadcast1ElementUint8Test)
-// ARMNN_AUTO_TEST_CASE(EqualBroadcast1DVectorUint8, EqualBroadcast1DVectorUint8Test)
+ARMNN_AUTO_TEST_CASE(SimpleEqual, EqualSimpleTest)
+ARMNN_AUTO_TEST_CASE(EqualBroadcast1Element, EqualBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(EqualBroadcast1DVector, EqualBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE(EqualUint8, EqualUint8Test)
+ARMNN_AUTO_TEST_CASE(EqualBroadcast1ElementUint8, EqualBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE(EqualBroadcast1DVectorUint8, EqualBroadcast1DVectorUint8Test)
 
-// // Greater
-// ARMNN_AUTO_TEST_CASE(SimpleGreater, GreaterSimpleTest)
-// ARMNN_AUTO_TEST_CASE(GreaterBroadcast1Element, GreaterBroadcast1ElementTest)
-// ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVector, GreaterBroadcast1DVectorTest)
-// ARMNN_AUTO_TEST_CASE(GreaterUint8, GreaterUint8Test)
-// ARMNN_AUTO_TEST_CASE(GreaterBroadcast1ElementUint8, GreaterBroadcast1ElementUint8Test)
-// ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVectorUint8, GreaterBroadcast1DVectorUint8Test)
+// Greater
+ARMNN_AUTO_TEST_CASE(SimpleGreater, GreaterSimpleTest)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1Element, GreaterBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVector, GreaterBroadcast1DVectorTest)
+ARMNN_AUTO_TEST_CASE(GreaterUint8, GreaterUint8Test)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1ElementUint8, GreaterBroadcast1ElementUint8Test)
+ARMNN_AUTO_TEST_CASE(GreaterBroadcast1DVectorUint8, GreaterBroadcast1DVectorUint8Test)
 
 // // Max
 // ARMNN_AUTO_TEST_CASE(SimpleMaximum, MaximumSimpleTest)
