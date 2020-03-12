@@ -276,7 +276,6 @@ if (VSI_NPU)
         set(OPENVX_HEADER_FILE "VX/vx.h")
         set(OVXLIB_HEADER_FILE "vsi_nn_pub.h")
         set(NNRT_HEADER_FILE "nnrt/ovxlib_delegate.hpp")
-        set(NNRT_HEADER_FILE_2 "ovxlib_delegate.hpp")
 
         # NO_CMAKE_FIND_ROOT_PATH makes sure that we only search in provided directory and
         # do not modify ROOT path using CMAKE_FIND_ROOT_PATH. If we do not find includes/libs
@@ -348,24 +347,11 @@ if (VSI_NPU)
             if(NOT NNRT_INCLUDE)
                 find_path(NNRT_INCLUDE "${NNRT_HEADER_FILE}"
                         PATHS "/usr/include" "/usr/local/include")
-            endif()
+            endif()            
         endif()
-
-        # NNRT internally does not use the "nnrt" folder prefix for headers, but it is
-        # used by its dependencies, so we add both nnrt/*.hpp and *.hpp.
-        if (NOT DEFINED NNRT_INCLUDE_2)
-            find_path(NNRT_INCLUDE_2 "${NNRT_HEADER_FILE_2}"
-                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
-                    PATH_SUFFIXES include inc include/nnrt inc/nnrt nnrt/include nnrt/inc nnrt
-                    NO_CMAKE_FIND_ROOT_PATH)
-            if(NOT NNRT_INCLUDE_2)
-                find_path(NNRT_INCLUDE_2 "${NNRT_HEADER_FILE_2}"
-                        PATHS "/usr/include" "/usr/local/include"
-                        PATH_SUFFIXES nnrt)
-            endif()
-        endif()
+        set(NNRT_INCLUDE_2 ${NNRT_INCLUDE}/nnrt)
         message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE}")
-        message(STATUS "NNRT(2) headers are located at: ${NNRT_INCLUDE_2}")
+        message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE_2}")
 
         if (NOT DEFINED NNRT_LIB)
             find_library(NNRT_LIB NAMES nnrt
