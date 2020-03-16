@@ -24,12 +24,11 @@
 
 #include "NpuWorkloadFactory.hpp"
 #include "NpuBackendId.hpp"
-#include "NpuTensorHandler.hpp"
 
-#include <backendsCommon/CpuTensorHandle.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 
+#include "NpuTensorHandler.hpp"
 #include "workloads/TNpuWorkloads.hpp"
 #include "workloads/NpuFullyConnectedWorkload.hpp"
 #include "workloads/NpuPooling2dWorkload.hpp"
@@ -47,7 +46,7 @@
 #include "workloads/NpuReshapeWorkload.hpp"
 #include "workloads/NpuLstmWorkload.hpp"
 #include "workloads/NpuStridedSliceWorkload.hpp"
-//#include "workloads/NpuSplitterWorkload.hpp"
+#include "workloads/NpuSplitterWorkload.hpp"
 //#include "workloads/NpuStackWorkload.hpp"
 #include "workloads/NpuConcatWorkload.hpp"
 #include "workloads/NpuSpaceToDepthWorkload.hpp"
@@ -60,6 +59,8 @@
 #include "workloads/NpuNormalizationWorkload.hpp"
 #include "workloads/NpuResizeWorkload.hpp"
 #include "workloads/NpuConstantWorkload.hpp"
+#include "workloads/NpuGreaterWorkload.hpp"
+#include "workloads/NpuEqualWorkload.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -160,9 +161,11 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateSoftmax(const SoftmaxQueueD
     return MakeWorkload<NpuSoftmaxFloat16Workload, NpuSoftmaxFloat32Workload, NpuSoftmaxUint8Workload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateSplitter(const SplitterQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const {
-    return MakeWorkload<NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
+std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateSplitter(
+    const SplitterQueueDescriptor& descriptor, const WorkloadInfo& info) const {
+    return MakeWorkload<NpuSplitterFloat16Workload,
+                        NpuSplitterFloat32Workload,
+                        NpuSplitterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
@@ -374,7 +377,8 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreatePad(const PadQueueDescripto
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const {
-    return MakeWorkload<NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
+    return MakeWorkload<NpuEqualFloat16Workload, NpuEqualFloat32Workload, NpuEqualUint8Workload>(
+        descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateBatchToSpaceNd(
@@ -391,9 +395,11 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateStridedSlice(
                         NpuStridedSliceUint8Workload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const {
-    return MakeWorkload<NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
+std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateGreater(
+    const GreaterQueueDescriptor& descriptor, const WorkloadInfo& info) const {
+    return MakeWorkload<NpuGreaterFloat16Workload,
+                        NpuGreaterFloat32Workload,
+                        NpuGreaterUint8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
