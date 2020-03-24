@@ -1514,7 +1514,7 @@ bool NpuLayerSupport::IsSplitterSupported(
     Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(descriptor);
     ignore_unused(outputs);
-    return false && IsSupportedForDataTypeRef(
+    return IsSupportedForDataTypeRef(
                         reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
 
