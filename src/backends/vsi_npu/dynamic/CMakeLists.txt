@@ -25,28 +25,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
                     -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
-if(NOT DEFINED ENV{VIVANTE_SDK_DIR})
-    message(FATAL_ERROR "please set ENV: VIVANTE_SDK_DIR")
-else()
-    set(OVX_DRIVER_ROOT $ENV{VIVANTE_SDK_DIR})
-    set(OVX_DRIVER_INCLUDE ${OVX_DRIVER_ROOT}/include)
-    set(OVX_DRIVER_LIB     ${OVX_DRIVER_ROOT}/drivers)
-endif()
-
-if(NOT DEFINED ENV{OVXLIB_DIR})
-    message(FATAL_ERROR "please set ENV: OVXLIB_DIR")
-else()
-    set(OVXLIB_DIR $ENV{OVXLIB_DIR})
-    set(OVXLIB_INCLUDE ${OVXLIB_DIR}/include)
-endif()
-
-if(NOT DEFINED ENV{NNRT_ROOT})
-    message(FATAL_ERROR "please set ENV: NNRT_ROOT")
-else()
-    set(NNRT_ROOT $ENV{NNRT_ROOT})
-    set(NNRT_INCLUDE ${NNRT_ROOT} ${NNRT_ROOT}/nnrt)
-endif()
-
 include_directories(
     ${OVXLIB_INCLUDE}
     ${OVX_DRIVER_INCLUDE}
@@ -55,7 +33,6 @@ include_directories(
 
 list(APPEND VsiNpuDynamicBackend_src
    NpuDynamicBackend.cpp
-   NpuDynamicBackend.hpp
    )
 
 set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)

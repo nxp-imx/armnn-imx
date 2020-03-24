@@ -34,9 +34,10 @@ if(VSI_NPU)
         NpuTensorHandler.cpp
         NpuWorkloadFactory.cpp
     )
+    add_subdirectory(dynamic)
     if(BUILD_UNIT_TESTS)
         add_subdirectory(test)
-    endif()    
+    endif()
 else()
     list(APPEND armnnNpuBackend_sources
         NpuLayerSupport.cpp
@@ -56,3 +57,4 @@ target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/arm
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/workloads)
+target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/dynamic)
