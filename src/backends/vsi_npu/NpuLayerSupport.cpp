@@ -834,7 +834,6 @@ bool NpuLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
                                         armnn::Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(input1);
     ignore_unused(output);
-    return false;
     return IsSupportedForDataTypeRef(
         reasonIfUnsupported, input0.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
@@ -1492,9 +1491,11 @@ bool NpuLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
     return supported;
 }
 
-bool NpuLayerSupport::IsSplitterSupported(const TensorInfo& input,
-                                          const ViewsDescriptor& descriptor,
-                                          Optional<std::string&> reasonIfUnsupported) const {
+bool NpuLayerSupport::IsSplitterSupported(
+    const TensorInfo& input,
+    const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+    const ViewsDescriptor& descriptor,
+    Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType, 3> supportedTypes = {
@@ -1505,17 +1506,6 @@ bool NpuLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                   "Npu splitter: input type not supported");
 
     return supported;
-}
-
-bool NpuLayerSupport::IsSplitterSupported(
-    const TensorInfo& input,
-    const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
-    const ViewsDescriptor& descriptor,
-    Optional<std::string&> reasonIfUnsupported) const {
-    ignore_unused(descriptor);
-    ignore_unused(outputs);
-    return IsSupportedForDataTypeRef(
-                        reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
 
 bool NpuLayerSupport::IsStridedSliceSupported(const TensorInfo& input,
