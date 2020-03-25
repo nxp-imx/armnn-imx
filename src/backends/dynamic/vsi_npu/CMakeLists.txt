@@ -1,6 +1,7 @@
 #/****************************************************************************
 #*
 #*    Copyright (c) 2019 Vivante Corporation
+#*    Copyright 2020 NXP
 #*
 #*    Permission is hereby granted, free of charge, to any person obtaining a
 #*    copy of this software and associated documentation files (the "Software"),
@@ -25,12 +26,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
                     -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
-include_directories(
-    ${OVXLIB_INCLUDE}
-    ${OVX_DRIVER_INCLUDE}
-    ${NNRT_INCLUDE}
-    )
-
 list(APPEND VsiNpuDynamicBackend_src
    NpuDynamicBackend.cpp
    )
@@ -38,10 +33,9 @@ list(APPEND VsiNpuDynamicBackend_src
 set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 
 file(GLOB VsiNpuBackendBaseFiles ${VsiNpuBackendPath}/*.cpp)
-file(GLOB VsiNpuBackendWorkloads ${VsiNpuBackendPath}/Workloads/*.cpp)
 
-list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles} ${VsiNpuBackendWorkloads})
-
+# replace static registry with dynamic
+list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles})
 list(REMOVE_ITEM VsiNpuBackendFiles ${VsiNpuBackendPath}/NpuStaticRegistry.cpp)
 
 add_library(Vsi_NpuAcc_backend MODULE ${VsiNpuDynamicBackend_src} ${VsiNpuBackendFiles})

@@ -1,7 +1,7 @@
 #/****************************************************************************
 #*
 #*    Copyright (c) 2019 Vivante Corporation
-#*    Copyright 2019 NXP
+#*    Copyright 2020 NXP
 #*
 #*    Permission is hereby granted, free of charge, to any person obtaining a
 #*    copy of this software and associated documentation files (the "Software"),
@@ -30,11 +30,11 @@ if(VSI_NPU)
         NpuBackend.cpp
         NpuLayerSupport.cpp
         NpuModelShell.cpp
+        NpuStaticRegistry.cpp
         NpuTensorAllocator.cpp
         NpuTensorHandler.cpp
         NpuWorkloadFactory.cpp
     )
-    add_subdirectory(dynamic)
     if(BUILD_UNIT_TESTS)
         add_subdirectory(test)
     endif()
@@ -45,16 +45,12 @@ else()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
-                    -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
+        -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
 add_library(armnnNpuBackend OBJECT ${armnnNpuBackend_sources})
-include_directories(${OVXLIB_INCLUDE}
-    ${OVX_DRIVER_INCLUDE}
-    ${NNRT_INCLUDE}
-)
+
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/workloads)
-target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/dynamic)
