@@ -126,6 +126,7 @@ Armnn_Interpreter::Armnn_Interpreter() {
     REGISTER_OP(EQUAL);
     REGISTER_OP(SPLIT);
     REGISTER_OP(GATHER);
+    REGISTER_OP(LINEAR);
 
 /*customer Op*/
 // REGISTER_OP(VSI_RESIZE_NEAREST);
@@ -681,8 +682,7 @@ OperationPtr Armnn_Interpreter::map_DEPTH_TO_SPACE(Model* model,
     std::shared_ptr<DepthToSpaceOperation> dp_to_sp = std::make_shared<DepthToSpaceOperation>();
     NNAPI_CHECK_PTR(dp_to_sp);
     std::vector<OperandPtr> inputs = model->getOperands(operation->inputs());
-    dp_to_sp->blockSize[0] = inputs[1]->scalar.int32;
-    dp_to_sp->blockSize[1] = inputs[1]->scalar.int32;
+    dp_to_sp->blockSize = inputs[1]->scalar.int32;
     truncateOperationIOs(model, operation, 1, 1);
     return dp_to_sp;
 }
@@ -980,6 +980,7 @@ OperationPtr Armnn_Interpreter::map_GATHER(Model* model,
     return op;
 }
 
+DECLARE_SAMPLE_OP(LINEAR, 3, 1, LinearOperation)
 DECLARE_SAMPLE_OP(RELU1, 1, 1, Relu1Operation)
 DECLARE_SAMPLE_OP(RELU6, 1, 1, Relu6Operation)
 DECLARE_SAMPLE_OP(ABS, 1, 1, AbsOperation)
