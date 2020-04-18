@@ -23,25 +23,27 @@
 #*
 #*****************************************************************************
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
-                    -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
+if(VSI_NPU)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
+                     -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
-list(APPEND VsiNpuDynamicBackend_src
-   NpuDynamicBackend.cpp
-   )
+   list(APPEND VsiNpuDynamicBackend_src
+      NpuDynamicBackend.cpp
+      )
 
-set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
+   set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 
-file(GLOB VsiNpuBackendBaseFiles ${VsiNpuBackendPath}/*.cpp)
+   file(GLOB VsiNpuBackendBaseFiles ${VsiNpuBackendPath}/*.cpp)
 
-# replace static registry with dynamic
-list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles})
-list(REMOVE_ITEM VsiNpuBackendFiles ${VsiNpuBackendPath}/NpuStaticRegistry.cpp)
+   # replace static registry with dynamic
+   list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles})
+   list(REMOVE_ITEM VsiNpuBackendFiles ${VsiNpuBackendPath}/NpuStaticRegistry.cpp)
 
-add_library(Vsi_NpuAcc_backend MODULE ${VsiNpuDynamicBackend_src} ${VsiNpuBackendFiles})
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
-set_target_properties(Vsi_NpuAcc_backend PROPERTIES PREFIX "")
-target_link_libraries(Vsi_NpuAcc_backend armnn)
+   add_library(Vsi_NpuAcc_backend MODULE ${VsiNpuDynamicBackend_src} ${VsiNpuBackendFiles})
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
+   set_target_properties(Vsi_NpuAcc_backend PROPERTIES PREFIX "")
+   target_link_libraries(Vsi_NpuAcc_backend armnn)
+endif()
