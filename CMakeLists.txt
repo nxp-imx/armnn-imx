@@ -1,5 +1,6 @@
 #
 # Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
 cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
@@ -581,6 +582,10 @@ target_link_libraries(armnn ${Boost_THREAD_LIBRARY}
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
+endif()
+
+if(VSI_NPU)
+    target_link_libraries(armnn ${VSI_NPU_LIBRARIES})
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))

@@ -23,6 +23,7 @@ option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' fold
 option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
 option(SHARED_BOOST "Use dynamic linking for boost libraries" OFF)
+option(VSI_NPU "Build with VSI NPU (OpenVX) support" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -255,6 +256,112 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
         set(ARMCOMPUTE_LIBRARIES
             debug ${ARMCOMPUTE_LIBRARY_DEBUG} ${ARMCOMPUTE_CORE_LIBRARY_DEBUG}
             optimized ${ARMCOMPUTE_LIBRARY_RELEASE} ${ARMCOMPUTE_CORE_LIBRARY_RELEASE} )
+    endif()
+endif()
+
+# ARM Compute NPU backend
+if (VSI_NPU)
+    if (NOT DEFINED VSI_NPU_LIBRARIES)
+        # Add preprocessor definition for ARM Compute NPU
+        add_definitions(-DVSI_NPU_ENABLED)
+
+        # The following files are checked during search for include dirs. This makes sure 
+        # there is correct directory structure and that at least one valid file exists.
+        set(OPENVX_HEADER_FILE "VX/vx.h")
+        set(OVXLIB_HEADER_FILE "vsi_nn_pub.h")
+        set(NNRT_HEADER_FILE "nnrt/ovxlib_delegate.hpp")
+
+        # NO_CMAKE_FIND_ROOT_PATH makes sure that we only search in provided directory and
+        # do not modify ROOT path using CMAKE_FIND_ROOT_PATH. If we do not find includes/libs
+        # using CMAKE_FIND_ROOT_PATH we still try paths with modified root.
+        #
+        # Also note that search is attempted only when variables are not defined, i.e. when
+        # they are NOT forced by the user.
+        #
+        # We may also use env variables.
+
+        if (NOT DEFINED OPENVX_DRIVER_INCLUDE)
+            find_path(OPENVX_DRIVER_INCLUDE VX/vx.h
+                    PATHS ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                    PATH_SUFFIXES include inc
+                    NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT OPENVX_DRIVER_INCLUDE)
+                find_path(OPENVX_DRIVER_INCLUDE VX/vx.h
+                          PATHS "/usr/include" "/usr/local/include")
+            endif()
+        endif()
+        message(STATUS "OpenVX headers are located at: ${OPENVX_DRIVER_INCLUDE}")
+
+        if (NOT DEFINED OPENVX_DRIVER_LIB)
+            find_library(OPENVX_DRIVER_LIB NAMES OpenVX
+                        PATHS ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                        PATH_SUFFIXES lib drivers lib64
+                        NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT OPENVX_DRIVER_LIB)
+                find_library(OPENVX_DRIVER_LIB NAMES OpenVX
+                             PATHS "/usr/lib" "/usr/local/lib" "/usr/local/lib64")
+                
+            endif()
+            # we look for libOpenVX, libOpenVXU and libGAL which should all be in the
+            # same directory
+            get_filename_component(OPENVX_DRIVER_LIB ${OPENVX_DRIVER_LIB} DIRECTORY)
+        endif()
+        message(STATUS "OpenVX library located at: ${OPENVX_DRIVER_LIB}")
+
+        if (NOT DEFINED OVXLIB_INCLUDE)
+            find_path(OVXLIB_INCLUDE "${OVXLIB_HEADER_FILE}"
+                    PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                    PATH_SUFFIXES include include/OVXLIB OVXLIB inc inc/OVXLIB
+                    NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT OVXLIB_INCLUDE)
+                find_path(OVXLIB_INCLUDE "${OVXLIB_HEADER_FILE}"
+                        PATHS "/usr/include" "/usr/local/include"
+                        PATH_SUFFIXES OVXLIB)
+            endif()
+        endif()
+        message(STATUS "Ovxlib headers are located at: ${OVXLIB_INCLUDE}")
+
+        if (NOT DEFINED OVXLIB_LIB)
+            find_library(OVXLIB_LIB NAMES ovxlib
+                        PATHS ${OVXLIB_ROOT} $ENV{OVXLIB_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                        PATH_SUFFIXES lib drivers lib64
+                        NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT OVXLIB_LIB)
+                find_library(OVXLIB_LIB NAMES ovxlib
+                             PATHS "/usr/lib" "/usr/local/lib" "/usr/local/lib64")
+            endif()
+        endif()
+        message(STATUS "Ovxlib library located at: ${OVXLIB_LIB}")
+
+        if (NOT DEFINED NNRT_INCLUDE)
+            find_path(NNRT_INCLUDE "${NNRT_HEADER_FILE}"
+                    PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                    PATH_SUFFIXES include inc
+                    NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT NNRT_INCLUDE)
+                find_path(NNRT_INCLUDE "${NNRT_HEADER_FILE}"
+                        PATHS "/usr/include" "/usr/local/include")
+            endif()            
+        endif()
+        set(NNRT_INCLUDE_2 ${NNRT_INCLUDE}/nnrt)
+        message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE}")
+        message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE_2}")
+
+        if (NOT DEFINED NNRT_LIB)
+            find_library(NNRT_LIB NAMES nnrt
+                        PATHS ${NNRT_ROOT} $ENV{NNRT_ROOT} ${OPENVX_DRIVER_ROOT} $ENV{OPENVX_DRIVER_ROOT}
+                        PATH_SUFFIXES lib drivers lib64
+                        NO_CMAKE_FIND_ROOT_PATH)
+            if(NOT NNRT_LIB)
+                find_library(NNRT_LIB NAMES nnrt
+                             PATHS "/usr/lib" "/usr/local/lib" "/usr/local/lib64")
+            endif()
+        endif()
+        message(STATUS "NNRT library located at: ${NNRT_LIB}")
+
+        include_directories(SYSTEM ${OPENVX_DRIVER_INCLUDE} ${NNRT_INCLUDE} ${NNRT_INCLUDE_2} ${OVXLIB_INCLUDE})
+        link_libraries(-L${NNRT_LIB} -L${OVXLIB_LIB} -L${OPENVX_DRIVER_LIB})
+        set(VSI_NPU_LIBRARIES ovxlib nnrt OpenVX OpenVXU GAL)
     endif()
 endif()
 
