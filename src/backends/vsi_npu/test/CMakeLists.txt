@@ -21,6 +21,7 @@ add_library(armnnNpuBackendUnitTests OBJECT ${armnnNpuBackendUnitTests_sources})
 
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/dynamic/vsi_npu)

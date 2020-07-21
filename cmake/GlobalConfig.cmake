@@ -56,7 +56,7 @@ endif()
 # Compiler flags that are always set
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(COMPILER_IS_GNU_LIKE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wno-error=deprecated-copy -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-error=deprecated-copy -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	# Disable C4996 (use of deprecated identifier) due to https://developercommunity.visualstudio.com/content/problem/252574/deprecated-compilation-warning-for-virtual-overrid.html
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /wd4996")
@@ -262,9 +262,6 @@ endif()
 # ARM Compute NPU backend
 if (VSI_NPU)
     if (NOT DEFINED VSI_NPU_LIBRARIES)
-        # Add preprocessor definition for ARM Compute NPU
-        add_definitions(-DVSI_NPU_ENABLED)
-
         # The following files are checked during search for include dirs. This makes sure 
         # there is correct directory structure and that at least one valid file exists.
         set(OPENVX_HEADER_FILE "VX/vx.h")
@@ -345,7 +342,7 @@ if (VSI_NPU)
         endif()
         set(NNRT_INCLUDE_2 ${NNRT_INCLUDE}/nnrt)
         message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE}")
-        message(STATUS "NNRT headers are located at: ${NNRT_INCLUDE_2}")
+        message(STATUS "NNRT(2) headers are located at: ${NNRT_INCLUDE_2}")
 
         if (NOT DEFINED NNRT_LIB)
             find_library(NNRT_LIB NAMES nnrt
