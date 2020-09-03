@@ -141,19 +141,13 @@ endif()
 
 if (NOT BUILD_PIPE_ONLY)
   # cxxopts (Alternative to boost::program_options)
-  find_path(CXXOPTS_INCLUDE
-            NAMES "cxxopts/cxxopts.hpp"
-            PATHS "third-party"
-            NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+  find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party)
   include_directories(SYSTEM "${CXXOPTS_INCLUDE}")
 endif()
 
 if (NOT BUILD_PIPE_ONLY)
   # ghc (Alternative to boost::filesystem)
-  find_path(GHC_INCLUDE 
-            NAMES "ghc/filesystem.hpp"
-            PATHS "third-party"
-            NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+  find_path(GHC_INCLUDE ghc/filesystem.hpp PATHS third-party)
   include_directories(SYSTEM "${GHC_INCLUDE}")
 endif()
 
