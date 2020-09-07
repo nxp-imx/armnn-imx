@@ -75,10 +75,10 @@ The instructions assume basic Linux knowledge and show how to build the ArmNN co
 #### <a name="buildCL">Build Compute Library</a>
 * It is recommended to build [NXP's fork of ACL](https://source.codeaurora.org/external/imx/arm-computelibrary-imx), which is tested to run on the i.MX8 platform. [Official ACL](https://github.com/ARM-software/ComputeLibrary) can also be used, but might lead to unexpected compile failures. Make sure that the ArmNN (in the next step) and ACL versions match. Additionally scons is used for building. It is a python package and should be supported for both Python 2.7 and 3.x versions. It can be installed using `pip install scons`:
     ```bash
-    git clone https://source.codeaurora.org/external/imx/arm-computelibrary-imx -b imx_19.08
+    git clone https://source.codeaurora.org/external/imx/arm-computelibrary-imx -b imx_20.02
     cd arm-computelibrary-imx
     source <yocto_sdk_path>/environment-setup-aarch64-poky-linux
-    scons Werror=0 -j$(nproc) neon=1 opencl=1 os=linux arch=arm64-v8a build=cross_compile embed_kernels=1 cppthreads=1 mali=0 gles_compute=0 extra_cxx_flags="-fPIC"
+    scons Werror=0 -j$(nproc) neon=1 opencl=1 os=linux arch=arm64-v8a build=cross_compile embed_kernels=1 gles_compute=0
     ```
 
 #### <a name="buildANN">Build ArmNN</a>
@@ -100,8 +100,7 @@ The instructions assume basic Linux knowledge and show how to build the ArmNN co
     -DBOOST_ROOT=<boost_arm64_install_dir> \
     -DPROTOBUF_ROOT=<protobuf_arm64_install_dir> \
     -DPROTOBUF_LIBRARY_DEBUG=<protobuf_arm64_install_dir>/lib/libprotobuf.so.15.0.1 \
-    -DPROTOBUF_LIBRARY_RELEASE=<protobuf_arm64_install_dir>/lib/libprotobuf.so.15.0.1 \
-    -DGENERIC_LIB_VERSION="19.08"
+    -DPROTOBUF_LIBRARY_RELEASE=<protobuf_arm64_install_dir>/lib/libprotobuf.so.15.0.1
     ```
 * Run the build
     ```bash
@@ -112,7 +111,7 @@ The instructions assume basic Linux knowledge and show how to build the ArmNN co
 #### <a name="unittests">Run Unit Tests</a>
 * Copy the build folder to an arm64 linux machine. You may exclude all those CMakes to create an archive with the following command:
     ```bash
-    tar --exclude='*.o' --exclude='*.os' --exclude='*.cmake' --exclude='CMake*' --exclude='Makefile' --exclude='samples' --exclude='src' -czvf armnn-imx_19.08.tar.gz *
+    tar --exclude='*.o' --exclude='*.os' --exclude='*.cmake' --exclude='CMake*' --exclude='Makefile' --exclude='samples' --exclude='src' -czvf armnn-imx_20.02.tar.gz *
     ```
 * Copy the protobuf shared library (and links) to the ArmNN build folder and set *LD_LIBRARY_PATH* to include it:
     ```bash
@@ -126,10 +125,9 @@ The instructions assume basic Linux knowledge and show how to build the ArmNN co
 #### <a name="vsinpubackend">VSI NPU backend</a>
 * [NXP's fork of ArmNN](https://source.codeaurora.org/external/imx/armnn-imx) contains VeriSilicon's VSI NPU backend, which uses OpenVX to accelerate neural networks on GPU.
     ```
-    -DVSI_NPU=1 \
-    -DBUILD_VSI_TESTS=1 \
+    -DVSI_NPU=1
     ```
-* Use *VSI_NPU* build option (disabled by default) to enable it. Additionally there is *BUILD_VSI_TESTS* build option, which enables tests for individual models from VeriSilicon. There are 3 sets of tests - TF Lite, TF and Caffe. You must build the specific parser to build the set as well.
+* Use *VSI_NPU* build option (disabled by default) to enable it.
 * VSI NPU backend has several dependencies - OpenVX, ovxlib and NNRT. [OpenVX](https://www.khronos.org/openvx/) is a standard for computer vision designed by Khronos and it is implemented as a driver targeted for specific GPUs. NNRT is VeriSilicon's library to process neural networks and ovxlib is a layer between the OpenVX driver and NNRT. If the Yocto SDK you are using already includes a GPU driver version targeted for development, CMake should find all the dependencies. If not or if you are using a customized driver, you need to set the following build variables. You may only use the *_ROOT* suffix to find both libraries and includes or you may specify libraries and includes separately using *_INCLUDE* and *_LIB*. It is better to either use *_ROOT* alone or *_INCLUDE* and *_LIB* together. After configuration is done, make sure to check the output if correct directories were found:
 * For OpenVX:
     ```bash
@@ -201,10 +199,10 @@ Support for using [Caffe](http://caffe.berkeleyvision.org/) models.
 
 #### <a name="tfparser">Tensorflow Parser</a>
 Support for using [Tensorflow](https://www.tensorflow.org/) models.
-* Run the script to generate required files. [NXP's fork of Tensorflow](https://source.codeaurora.org/external/imx/tensorflow-imx) 1.13.2 is tested, other versions may or may not work:
-    ```    
-    git clone https://source.codeaurora.org/external/imx/tensorflow-imx -b imx-v1.13.2
-    cd tensorflow-imx
+* Run the script to generate required files. [TensorFlow 1.15.0](https://github.com/tensorflow/tensorflow) is tested, other versions may or may not work:
+    ```
+    git clone https://github.com/tensorflow/tensorflow.git -b r1.15
+    cd tensorflow
     <armnn-imx_dir>/scripts/generate_tensorflow_protobuf.sh <tf_generated_files_dir> <protobuf_x86_install_dir>
     ```
 
@@ -229,18 +227,18 @@ Support for using [Tensorflow Lite](https://www.tensorflow.org/lite) models. Ten
     cmake -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_FLATC=OFF -DFLATBUFFERS_BUILD_FLATHASH=OFF -DFLATBUFFERS_BUILD_TESTS=OFF
     make -j$(nproc)
     ```
-* Clone Tensorflow 1.13.2:
+* Clone Tensorflow 1.15.0:
     ```    
-    git clone https://source.codeaurora.org/external/imx/tensorflow-imx -b imx-v1.13.2
-    cd tensorflow-imx
+    git clone https://github.com/tensorflow/tensorflow.git -b r1.15
+    cd tensorflow
     ```
 * Add the following lines to your CMake command to configure your build environment:
     ```
-    -DTF_LITE_GENERATED_PATH=<tensorflow path>/tensorflow/lite/schema \
-    -DTF_LITE_SCHEMA_INCLUDE_PATH=<tensorflow path>/tensorflow/lite/schema \    
-    -DFLATBUFFERS_ROOT=<flatbuffers path> \
-    -DFLATBUFFERS_INCLUDE_PATH=<flatbuffers path>/include \
-    -DFLATBUFFERS_LIBRARY=<flatbuffers path>/libflatbuffers.a \
+    -DTF_LITE_GENERATED_PATH=<tensorflow_path>/tensorflow/lite/schema \
+    -DTF_LITE_SCHEMA_INCLUDE_PATH=<tensorflow_path>/tensorflow/lite/schema \
+    -DFLATBUFFERS_ROOT=<flatbuffers_path> \
+    -DFLATBUFFERS_INCLUDE_PATH=<flatbuffers_path>/include \
+    -DFLATBUFFERS_LIBRARY=<flatbuffers_path>/libflatbuffers.a \
     -DBUILD_TF_LITE_PARSER=1 \
     ```
 
@@ -251,14 +249,14 @@ Support for using [ONNX](https://onnx.ai/) (Open Neural Network Exchange) models
     ```bash
     tar -zxvf onnx-1.6.0.tar.gz
     cd onnx-1.6.0/
-    export LD_LIBRARY_PATH=<x86_64 protobuf install path>/lib:$LD_LIBRARY_PATH
-    mkdir <onnx generated files path>
-    <x86_64 protobuf install path>/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=<x86_64 protobuf install path>/include --cpp_out <onnx generated files path>
+    export LD_LIBRARY_PATH=<x86_64_protobuf_install_path>/lib:$LD_LIBRARY_PATH
+    mkdir <onnx_generated_files_path>
+    <x86_64_protobuf_install_path>/bin/protoc onnx/onnx.proto --proto_path=. --proto_path=<x86_64_protobuf_install_path>/include --cpp_out <onnx_generated_files_path>
     ```
 * Add the following lines to your CMake command to configure your build environment:
     ```
     -DBUILD_ONNX_PARSER=1 \
-    -DONNX_GENERATED_SOURCES=<onnx generated files path> \
+    -DONNX_GENERATED_SOURCES=<onnx_generated_files_path> \
     ```
 
 #### <a name="troubleshooting">Troubleshooting and Errors</a>

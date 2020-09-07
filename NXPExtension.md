@@ -1,5 +1,23 @@
 # VSI NPU backend changelog
 
+### 07/30/2020
+* Enabled TransposeConvolution2d unit test
+* Fixed l2_norm and local_response_norm
+* Added Abs/Exp/Sqrt/Neg in elementwise unary
+* Added LogSoftmax support
+* Added Argmax and Argmin support
+* Removed AvgPool unit tests with zp=-1
+* Added DetectionPostProcess support
+* Added InstanceNorm support
+* Added DepthToSpace support
+* Added GREATER_EQUAL, NOT_EQUAL, LESS, LESS_EQUAL ops
+
+### 07/17/2020
+* Added Slice support
+
+### 05/26/2020
+* Update to 20.02 interface.
+
 ### 04/22/2020
 * Updated 2D convolution OverflowPolicy from WRAP to SATURATE
 * Support dilation in depthwise convolution
@@ -23,6 +41,10 @@
 * Fixed build errors with TensorHandler and FusedType
 
 # Known Limitations
+
+### 20.02
+* OpenCL backend is not supported. i.MX8 devices do not support Arm NN / ACL OpenCL requirements.
+* Unexpected predictions on some floating point models and ConstantLinearActivation were fixed. No known issues.
 
 ### 19.08.01
 * ConstantLinearActivation producing incorrect results on the VSI NPU backend
