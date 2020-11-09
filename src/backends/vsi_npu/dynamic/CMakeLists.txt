@@ -1,6 +1,7 @@
 #/****************************************************************************
 #*
 #*    Copyright (c) 2019 Vivante Corporation
+#*    Copyright 2020 NXP
 #*
 #*    Permission is hereby granted, free of charge, to any person obtaining a
 #*    copy of this software and associated documentation files (the "Software"),
@@ -22,56 +23,28 @@
 #*
 #*****************************************************************************
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
-                    -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
+if(VSI_NPU)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-old-style-cast \
+                     -Wno-sign-conversion -Wno-conversion -Wno-unused-variable")
 
-if(NOT DEFINED ENV{VIVANTE_SDK_DIR})
-    message(FATAL_ERROR "please set ENV: VIVANTE_SDK_DIR")
-else()
-    set(OVX_DRIVER_ROOT $ENV{VIVANTE_SDK_DIR})
-    set(OVX_DRIVER_INCLUDE ${OVX_DRIVER_ROOT}/include)
-    set(OVX_DRIVER_LIB     ${OVX_DRIVER_ROOT}/drivers)
+   list(APPEND VsiNpuDynamicBackend_src
+      NpuDynamicBackend.cpp
+      )
+
+   set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
+
+   file(GLOB VsiNpuBackendBaseFiles ${VsiNpuBackendPath}/*.cpp)
+
+   # replace static registry with dynamic
+   list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles})
+   list(REMOVE_ITEM VsiNpuBackendFiles ${VsiNpuBackendPath}/NpuStaticRegistry.cpp)
+
+   add_library(Vsi_NpuAcc_backend MODULE ${VsiNpuDynamicBackend_src} ${VsiNpuBackendFiles})
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
+   target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
+   set_target_properties(Vsi_NpuAcc_backend PROPERTIES PREFIX "")
+   target_link_libraries(Vsi_NpuAcc_backend armnn)
 endif()
-
-if(NOT DEFINED ENV{OVXLIB_DIR})
-    message(FATAL_ERROR "please set ENV: OVXLIB_DIR")
-else()
-    set(OVXLIB_DIR $ENV{OVXLIB_DIR})
-    set(OVXLIB_INCLUDE ${OVXLIB_DIR}/include)
-endif()
-
-if(NOT DEFINED ENV{NNRT_ROOT})
-    message(FATAL_ERROR "please set ENV: NNRT_ROOT")
-else()
-    set(NNRT_ROOT $ENV{NNRT_ROOT})
-    set(NNRT_INCLUDE ${NNRT_ROOT} ${NNRT_ROOT}/nnrt)
-endif()
-
-include_directories(
-    ${OVXLIB_INCLUDE}
-    ${OVX_DRIVER_INCLUDE}
-    ${NNRT_INCLUDE}
-    )
-
-list(APPEND VsiNpuDynamicBackend_src
-   NpuDynamicBackend.cpp
-   NpuDynamicBackend.hpp
-   )
-
-set(VsiNpuBackendPath ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
-
-file(GLOB VsiNpuBackendBaseFiles ${VsiNpuBackendPath}/*.cpp)
-file(GLOB VsiNpuBackendWorkloads ${VsiNpuBackendPath}/Workloads/*.cpp)
-
-list(APPEND VsiNpuBackendFiles ${VsiNpuBackendBaseFiles} ${VsiNpuBackendWorkloads})
-
-list(REMOVE_ITEM VsiNpuBackendFiles ${VsiNpuBackendPath}/NpuStaticRegistry.cpp)
-
-add_library(Vsi_NpuAcc_backend MODULE ${VsiNpuDynamicBackend_src} ${VsiNpuBackendFiles})
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
-target_include_directories(Vsi_NpuAcc_backend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
-set_target_properties(Vsi_NpuAcc_backend PROPERTIES PREFIX "")
-target_link_libraries(Vsi_NpuAcc_backend armnn)

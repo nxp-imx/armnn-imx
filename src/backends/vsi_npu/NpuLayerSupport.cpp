@@ -117,6 +117,7 @@ struct Rule {
 
 template <typename T>
 bool AllTypesAreEqualImpl(T t) {
+    ignore_unused(t);
     return true;
 }
 
@@ -854,6 +855,8 @@ bool NpuLayerSupport::IsGreaterSupported(const TensorInfo& input0,
 
 bool NpuLayerSupport::IsInputSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(input);
+    ignore_unused(reasonIfUnsupported);
     return true;
 }
 
@@ -899,6 +902,16 @@ bool NpuLayerSupport::IsLstmSupported(const TensorInfo& input,
                          Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
     // TODO: {Sven} check data type matched
+    ignore_unused(input);
+    ignore_unused(outputStateIn);
+    ignore_unused(cellStateIn);
+    ignore_unused(scratchBuffer);
+    ignore_unused(outputStateOut);
+    ignore_unused(cellStateOut);
+    ignore_unused(output);
+    ignore_unused(descriptor);
+    ignore_unused(paramsInfo);
+    ignore_unused(reasonIfUnsupported);
     return supported;
     }
 // bool NpuLayerSupport::IsLstmSupported(const TensorInfo& input,
@@ -1188,8 +1201,6 @@ bool NpuLayerSupport::IsNormalizationSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const NormalizationDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported) const {
-    ignore_unused(descriptor);
-
     // Define supported types
     std::array<DataType, 3> supportedTypes = {
         DataType::Float32, DataType::QAsymmU8, DataType::Float16};
@@ -1218,6 +1229,8 @@ bool NpuLayerSupport::IsNormalizationSupported(const TensorInfo& input,
 
 bool NpuLayerSupport::IsOutputSupported(const TensorInfo& output,
                                         Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
     return true;
 }
 
@@ -1227,7 +1240,6 @@ bool NpuLayerSupport::IsPadSupported(const TensorInfo& input,
                                      Optional<std::string&> reasonIfUnsupported) const {
     bool supported = true;
     ignore_unused(output);
-    ignore_unused(descriptor);
 
     supported &= CheckSupportRule(
         IsInputDimsSupported(input), reasonIfUnsupported, "Npu pad: input dimension not support.");
@@ -1250,6 +1262,9 @@ bool NpuLayerSupport::IsPermuteSupported(const TensorInfo& input,
 bool NpuLayerSupport::IsPreCompiledSupported(const TensorInfo& input,
                                              const PreCompiledDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(input);
+    ignore_unused(descriptor);
+    ignore_unused(reasonIfUnsupported);
     return false;
 }
 
@@ -1316,6 +1331,7 @@ bool NpuLayerSupport::IsReshapeSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const ReshapeDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(output);
     ignore_unused(descriptor);
     // Define supported output types.
     std::array<DataType, 3> supportedOutputTypes = {
@@ -1335,6 +1351,7 @@ bool NpuLayerSupport::IsResizeSupported(const TensorInfo& input,
                                         const ResizeDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported) const
 {
+    ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType,3> supportedTypes =
     {
@@ -1440,7 +1457,7 @@ bool NpuLayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 const SpaceToBatchNdDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported) const {
-    ignore_unused(output);
+    ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType, 3> supportedTypes = {
         DataType::Float32, DataType::QAsymmU8, DataType::Float16};
@@ -1495,6 +1512,7 @@ bool NpuLayerSupport::IsSplitterSupported(
     const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
     const ViewsDescriptor& descriptor,
     Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(outputs);
     ignore_unused(descriptor);
     bool supported = true;
     std::array<DataType, 3> supportedTypes = {
