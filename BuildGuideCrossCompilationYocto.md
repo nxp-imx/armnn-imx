@@ -215,23 +215,13 @@ Support for using [Tensorflow](https://www.tensorflow.org/) models.
 #### <a name="tfliteparser">Tensorflow Lite Parser</a>
 Support for using [Tensorflow Lite](https://www.tensorflow.org/lite) models. Tensorflow Lite is a subset of Tensorflow targeted for embedded. In order to build the parser, the main difference from Tensorflow is that instead of protobuf, it uses [FlatBuffers](https://google.github.io/flatbuffers/index.html#flatbuffers_overview) as a serialization library.
 
-* Download [FlatBuffers v1.11.0](https://github.com/google/flatbuffers/releases).
-    ```bash 
-    tar -zxvf flatbuffers-1.11.0.tar.gz
-    cd flatbuffers-1.11.0/
-    ```
-* Open *CMakeLists.txt*, add `set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")` e.g. below `if(EXISTS "${CMAKE_TOOLCHAIN_FILE}")` or somewhere where CMake will modify *MAKE_CXX_FLAGS* and save. This is because the `-fPIC` switch must be added, but the C++ flags are being overwritten by the global Yocto toolchain CMake config.
-* Build FlatBuffers without tests, flatc and flathash:
-    ```bash 
-    source <yocto_sdk_path>/environment-setup-aarch64-poky-linux
-    cmake -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_FLATC=OFF -DFLATBUFFERS_BUILD_FLATHASH=OFF -DFLATBUFFERS_BUILD_TESTS=OFF
-    make -j$(nproc)
-    ```
+
 * Clone Tensorflow 1.15.0:
     ```    
     git clone https://github.com/tensorflow/tensorflow.git -b r1.15
     cd tensorflow
     ```
+* Make sure to [build FlatBuffers for arm64](#flatbuffers).
 * Add the following lines to your CMake command to configure your build environment:
     ```
     -DTF_LITE_GENERATED_PATH=<tensorflow_path>/tensorflow/lite/schema \
@@ -240,6 +230,30 @@ Support for using [Tensorflow Lite](https://www.tensorflow.org/lite) models. Ten
     -DFLATBUFFERS_INCLUDE_PATH=<flatbuffers_path>/include \
     -DFLATBUFFERS_LIBRARY=<flatbuffers_path>/libflatbuffers.a \
     -DBUILD_TF_LITE_PARSER=1 \
+    ```
+
+#### <a name="flatbuffers">FlatBuffers</a>
+
+FlatBuffers static library is required for the target machine (arm64) in case you are building the TF Lite Parser. Flatc (Flatbuffers compiler) is required for the host machine (x86_64) if you are building the Arm NN Serializer.
+
+* Download [FlatBuffers v1.12.0](https://github.com/google/flatbuffers/releases).
+    ```bash 
+    tar -zxvf flatbuffers-1.12.0.tar.gz
+    cd flatbuffers-1.12.0/
+    ```
+* Build FlatBuffers without tests and flathash for x86_64:
+    ```bash 
+    cmake -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_FLATC=ON -DFLATBUFFERS_BUILD_FLATHASH=OFF -DFLATBUFFERS_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=<flatbuffers_x86_64_install_dir>
+    make -j$(nproc)
+    make install
+    ```
+* Make sure to add `-fPIC` to `CMAKE_CXX_FLAGS`. You can achieve this ege by opening *CMakeLists.txt* and adding `set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")` at the end of the file.
+* Build FlatBuffers without tests, flathash and flatc for arm64 (you do not need flatc, but it might get useful if you ever compile natively):
+    ```bash 
+    source <yocto_sdk_path>/environment-setup-aarch64-poky-linux
+    cmake -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_BUILD_FLATC=OFF -DFLATBUFFERS_BUILD_FLATHASH=OFF -DFLATBUFFERS_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=<flatbuffers_arm64_install_dir>
+    make -j$(nproc)
+    make install
     ```
 
 #### <a name="onnxparser">ONNX Parser</a>
