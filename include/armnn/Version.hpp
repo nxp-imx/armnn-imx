@@ -10,9 +10,9 @@
 #define STRINGIFY_MACRO(s) #s
 
 // ArmNN version components
-#define ARMNN_MAJOR_VERSION 20
-#define ARMNN_MINOR_VERSION 08
-#define ARMNN_PATCH_VERSION 00
+#define ARMNN_MAJOR_VERSION 22
+#define ARMNN_MINOR_VERSION 0
+#define ARMNN_PATCH_VERSION 0
 
 /// ARMNN_VERSION: "X.Y.Z"
 /// where:
