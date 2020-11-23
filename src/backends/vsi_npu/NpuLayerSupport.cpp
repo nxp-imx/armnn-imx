@@ -578,7 +578,9 @@ bool NpuLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 bool NpuLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(input);
     ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
     return false;
     return IsSupportedForDataTypeRef(
         reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
