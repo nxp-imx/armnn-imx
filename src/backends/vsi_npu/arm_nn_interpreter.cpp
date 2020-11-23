@@ -354,6 +354,7 @@ void Armnn_Interpreter::truncateOperationIOs(Model* model,
                                             OperationPtr operation,
                                             int32_t input_num,
                                             int32_t output_num) {
+    ignore_unused(model);
     // Size - 1 = axis
     input_num = computeAxis(input_num, operation->inputs().size() + 1);
     output_num = computeAxis(output_num, operation->outputs().size() + 1);
@@ -503,6 +504,7 @@ OperationPtr Armnn_Interpreter::map_DEPTHWISE_CONV_2D(Model* model,
 OperationPtr Armnn_Interpreter::map_RELU(Model* model,
                                         OperationPtr operation,
                                         uint32_t operation_index) {
+    ignore_unused(model);
     ignore_unused(operation_index);
     NNAPI_CHECK_IO_NUM(operation, 1, 1);
     return std::make_shared<ReluOperation>();
