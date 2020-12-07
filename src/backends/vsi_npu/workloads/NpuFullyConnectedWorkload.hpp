@@ -63,15 +63,16 @@ class NpuFullyConnectedFloatWorkload
                      ? std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias))
                      : nullptr) {
         auto inputPtr = dynamic_cast<NpuTensorHandler*>(descriptor.m_Inputs[0]);
+        uint32_t inputOperandId;
         if (inputPtr) {
-            uint32_t inputOperandId =
+            inputOperandId =
                 this->AddOperandAndSetValue(inputPtr->GetTensorInfo(), inputPtr->GetShape(), nullptr);
         }
 
         // Add weight operand
         TensorShape weightShape = m_Weight->GetShape();
         const TensorInfo& weightInfo = m_Weight->GetTensorInfo();
-        unsigned int weightOperandId;
+        uint32_t weightOperandId;
         if (descriptor.m_Parameters.m_TransposeWeightMatrix) {
             weightOperandId =
                 this->AddOperandAndSetValue(weightInfo, weightShape, m_Weight->GetTensor<void>());
@@ -98,7 +99,7 @@ class NpuFullyConnectedFloatWorkload
 
         // Add bias operand
         // assert(m_Bias != nullptr);
-        unsigned int biasOperandId;
+        uint32_t biasOperandId;
         if (m_Bias) {
             TensorInfo biasInfo = m_Bias->GetTensorInfo();
             const TensorShape biasShape = m_Bias->GetShape();
@@ -133,7 +134,7 @@ class NpuFullyConnectedFloatWorkload
 
         // Add fuse operand
         int32_t noneValue = 0;
-        unsigned int fuseOperandId = this->AddOperandAndSetValue(noneValue);
+        uint32_t fuseOperandId = this->AddOperandAndSetValue(noneValue);
 
         // Add fc operation to model
         int outputSize = descriptor.m_Outputs.size();
