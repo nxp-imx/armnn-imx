@@ -1,5 +1,6 @@
 //
 // Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright 2020 NXP
 // SPDX-License-Identifier: MIT
 //
 
