@@ -579,8 +579,6 @@ bool NpuLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const {
     ignore_unused(output);
     return false;
-    return IsSupportedForDataTypeRef(
-        reasonIfUnsupported, input.GetDataType(), &TrueFunc<>, &TrueFunc<>);
 }
 
 bool NpuLayerSupport::IsDepthwiseConvolutionSupported(
@@ -672,7 +670,7 @@ bool NpuLayerSupport::IsDetectionPostProcessSupported(
 
     bool supported = true;
 
-    std::array<DataType, 1> supportedInputTypes = {DataType::Float32};
+    std::array<DataType, 2> supportedInputTypes = {DataType::Float32, DataType::QAsymmU8};
 
     supported &=
         CheckSupportRule(TypeAnyOf(boxEncodings, supportedInputTypes),
