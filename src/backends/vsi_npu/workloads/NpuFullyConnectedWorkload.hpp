@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -62,9 +63,10 @@ class NpuFullyConnectedFloatWorkload
                      ? std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias))
                      : nullptr) {
         auto inputPtr = dynamic_cast<NpuTensorHandler*>(descriptor.m_Inputs[0]);
-
-        uint32_t inputOperandId =
-            this->AddOperandAndSetValue(inputPtr->GetTensorInfo(), inputPtr->GetShape(), nullptr);
+        if (inputPtr) {
+            uint32_t inputOperandId =
+                this->AddOperandAndSetValue(inputPtr->GetTensorInfo(), inputPtr->GetShape(), nullptr);
+        }
 
         // Add weight operand
         TensorShape weightShape = m_Weight->GetShape();
@@ -117,7 +119,7 @@ class NpuFullyConnectedFloatWorkload
             biasShape[0] = weightShape[0];  // output colum
             m_FakeBiasData.resize(biasShape[0]);
             biasInfo.SetShape(biasShape);
-            if (FakeBias::value == DataType::Signed32) {
+            if ((FakeBias::value == DataType::Signed32) && inputPtr) {
                 auto biasScale = inputPtr->GetTensorInfo().GetQuantizationScale() *
                                  weightInfo.GetQuantizationScale();
                 int32_t biasZp = 0;
@@ -145,9 +147,10 @@ class NpuFullyConnectedFloatWorkload
 
         for (int i = 0; i < outputSize; i++) {
             auto outputPtr = dynamic_cast<NpuTensorHandler*>(descriptor.m_Outputs[i]);
-
-            addOutputIndexes[i] = this->AddOperandAndSetValue(
-                outputPtr->GetTensorInfo(), outputPtr->GetShape(), nullptr);
+            if (outputPtr) {
+                addOutputIndexes[i] = this->AddOperandAndSetValue(
+                    outputPtr->GetTensorInfo(), outputPtr->GetShape(), nullptr);
+            }
         }
 
         this->AddOperation(

@@ -343,7 +343,7 @@ void Armnn_Interpreter::fillIntArray(Model* model,
 }
 
 int32_t Armnn_Interpreter::reverseMask(int32_t mask, size_t dim_num) {
-    auto get_bit_in_mask = [](int mask, int index) -> int { return (((int)0x1) << index) & mask; };
+    auto get_bit_in_mask = [](int in_mask, int index) -> int { return (((int)0x1) << index) & in_mask; };
     int32_t new_mask = 0;
     for (int i = (int)dim_num - 1; i >= 0; --i) {
         new_mask |= (get_bit_in_mask(mask, i) >> i) << ((dim_num - 1) - i);

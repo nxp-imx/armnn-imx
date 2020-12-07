@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -44,6 +45,7 @@ class NpuSplitterWorkload : public TNpuWorkload<SplitterQueueDescriptor, DataTyp
             dynamic_cast<NpuTensorHandler*>(descriptor.m_Inputs[0]);
         NpuTensorHandler* outputTensorHandle0 =
             dynamic_cast<NpuTensorHandler*>(descriptor.m_Outputs[0]);
+        m_Axis = 0;
         if (inputTensorHandle && outputTensorHandle0) {
             auto inputShape = inputTensorHandle->GetShape();
             auto output0Shape = outputTensorHandle0->GetShape();
@@ -58,8 +60,6 @@ class NpuSplitterWorkload : public TNpuWorkload<SplitterQueueDescriptor, DataTyp
                         break;
                     }
                 }
-            } else {
-                m_Axis = 0;
             }
         }
 
