@@ -3,6 +3,7 @@
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
+
 option(BUILD_CAFFE_PARSER "Build Caffe parser" OFF)
 option(BUILD_TF_PARSER "Build Tensorflow parser" OFF)
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)

@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -62,14 +63,16 @@ class NpuFullyConnectedFloatWorkload
                      ? std::make_unique<ScopedCpuTensorHandle>(*(descriptor.m_Bias))
                      : nullptr) {
         auto inputPtr = dynamic_cast<NpuTensorHandler*>(descriptor.m_Inputs[0]);
-
-        uint32_t inputOperandId =
-            this->AddOperandAndSetValue(inputPtr->GetTensorInfo(), inputPtr->GetShape(), nullptr);
+        uint32_t inputOperandId = 0;
+        if (inputPtr) {
+            inputOperandId =
+                this->AddOperandAndSetValue(inputPtr->GetTensorInfo(), inputPtr->GetShape(), nullptr);
+        }
 
         // Add weight operand
         TensorShape weightShape = m_Weight->GetShape();
         const TensorInfo& weightInfo = m_Weight->GetTensorInfo();
-        unsigned int weightOperandId;
+        uint32_t weightOperandId = 0;
         if (descriptor.m_Parameters.m_TransposeWeightMatrix) {
             weightOperandId =
                 this->AddOperandAndSetValue(weightInfo, weightShape, m_Weight->GetTensor<void>());
@@ -96,7 +99,7 @@ class NpuFullyConnectedFloatWorkload
 
         // Add bias operand
         // assert(m_Bias != nullptr);
-        unsigned int biasOperandId;
+        uint32_t biasOperandId = 0;
         if (m_Bias) {
             TensorInfo biasInfo = m_Bias->GetTensorInfo();
             const TensorShape biasShape = m_Bias->GetShape();
@@ -117,7 +120,7 @@ class NpuFullyConnectedFloatWorkload
             biasShape[0] = weightShape[0];  // output colum
             m_FakeBiasData.resize(biasShape[0]);
             biasInfo.SetShape(biasShape);
-            if (FakeBias::value == DataType::Signed32) {
+            if ((FakeBias::value == DataType::Signed32) && inputPtr) {
                 auto biasScale = inputPtr->GetTensorInfo().GetQuantizationScale() *
                                  weightInfo.GetQuantizationScale();
                 int32_t biasZp = 0;
@@ -131,7 +134,7 @@ class NpuFullyConnectedFloatWorkload
 
         // Add fuse operand
         int32_t noneValue = 0;
-        unsigned int fuseOperandId = this->AddOperandAndSetValue(noneValue);
+        uint32_t fuseOperandId = this->AddOperandAndSetValue(noneValue);
 
         // Add fc operation to model
         int outputSize = descriptor.m_Outputs.size();
@@ -145,9 +148,10 @@ class NpuFullyConnectedFloatWorkload
 
         for (int i = 0; i < outputSize; i++) {
             auto outputPtr = dynamic_cast<NpuTensorHandler*>(descriptor.m_Outputs[i]);
-
-            addOutputIndexes[i] = this->AddOperandAndSetValue(
-                outputPtr->GetTensorInfo(), outputPtr->GetShape(), nullptr);
+            if (outputPtr) {
+                addOutputIndexes[i] = this->AddOperandAndSetValue(
+                    outputPtr->GetTensorInfo(), outputPtr->GetShape(), nullptr);
+            }
         }
 
         this->AddOperation(

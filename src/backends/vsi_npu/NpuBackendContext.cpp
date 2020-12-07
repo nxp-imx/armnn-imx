@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,6 +27,10 @@
 
 #include <iostream>
 
+#include <boost/core/ignore_unused.hpp>
+
+using namespace boost;
+
 namespace armnn
 {
 
@@ -48,12 +53,14 @@ bool NpuBackendContext::AfterLoadNetwork(NetworkId networkId)
     //     std::lock_guard<std::mutex> lockGuard(m_Mutex);
     //     m_NetworkIds.insert(networkId);
     // }
+    ignore_unused(networkId);
     return true;
 }
 
-bool NpuBackendContext::BeforeUnloadNetwork(NetworkId)
+bool NpuBackendContext::BeforeUnloadNetwork(NetworkId networkId)
 {
     // return m_ClContextControlWrapper->Sync();
+    ignore_unused(networkId);
     return true;
 }
 
@@ -70,7 +77,7 @@ bool NpuBackendContext::AfterUnloadNetwork(NetworkId networkId)
     // {
     //     m_ClContextControlWrapper->ClearClCache();
     // }
-
+    ignore_unused(networkId);
     return true;
 }
 

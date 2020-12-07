@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -311,7 +312,7 @@ bool NpuLayerSupport::IsActivationSupported(const TensorInfo& input,
                                   "Npu activation: input and output shapes are of different rank.");
 
     struct ActivationFunctionSupported : public Rule {
-        ActivationFunctionSupported(const ActivationDescriptor& desc, const TensorInfo& input) {
+        ActivationFunctionSupported(const ActivationDescriptor& desc, const TensorInfo& tensorInput) {
             switch (desc.m_Function) {
                 case ActivationFunction::Abs:
                 case ActivationFunction::BoundedReLu:
@@ -327,7 +328,7 @@ bool NpuLayerSupport::IsActivationSupported(const TensorInfo& input,
                 }
                 case ActivationFunction::Linear:{
                     std::array<DataType, 1> supportedTypes = {DataType::Float32};
-                    m_Res = TypeAnyOf(input, supportedTypes)();
+                    m_Res = TypeAnyOf(tensorInput, supportedTypes)();
                 }
                 break;
                 default: {
@@ -578,7 +579,9 @@ bool NpuLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 bool NpuLayerSupport::IsDebugSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const {
+    ignore_unused(input);
     ignore_unused(output);
+    ignore_unused(reasonIfUnsupported);
     return false;
 }
 

@@ -1,6 +1,7 @@
 /****************************************************************************
 *
 *    Copyright (c) 2019 Vivante Corporation
+*    Copyright 2020 NXP
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -37,7 +38,9 @@
 #include <Optimizer.hpp>
 
 #include <boost/cast.hpp>
+#include <boost/core/ignore_unused.hpp>
 
+using namespace boost;
 
 namespace armnn
 {
@@ -51,6 +54,7 @@ const BackendId& NPUBackend::GetIdStatic()
 IBackendInternal::IWorkloadFactoryPtr NPUBackend::CreateWorkloadFactory(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager) const
 {
+    ignore_unused(memoryManager);
     return std::make_unique<NpuWorkloadFactory>();
 }
 
