@@ -153,12 +153,22 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateOutput(const OutputQueueDes
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const {
-    return MakeWorkload<NpuActivationFloat16Workload, NpuActivationFloat32Workload, NpuActivationUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuActivationFloat16Workload,
+                                     NpuActivationFloat32Workload,
+                                     NpuActivationUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuActivationInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateSoftmax(const SoftmaxQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info) const {
-    return MakeWorkload<NpuSoftmaxFloat16Workload, NpuSoftmaxFloat32Workload, NpuSoftmaxUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuSoftmaxFloat16Workload,
+                                     NpuSoftmaxFloat32Workload,
+                                     NpuSoftmaxUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuSoftmaxInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateSplitter(
@@ -175,9 +185,12 @@ std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMerger(const MergerQ
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateFullyConnected(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuFullyConnectedFloat16Workload,
-                        NpuFullyConnectedFloat32Workload,
-                        NpuFullyConnectedUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuFullyConnectedFloat16Workload,
+                                     NpuFullyConnectedFloat32Workload,
+                                     NpuFullyConnectedUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuFullyConnectedInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreatePermute(
@@ -189,23 +202,32 @@ std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreatePermute(
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreatePooling2d(
     const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuPooling2dFloat16Workload,
-                        NpuPooling2dFloat32Workload,
-                        NpuPooling2dUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuPooling2dFloat16Workload,
+                                     NpuPooling2dFloat32Workload,
+                                     NpuPooling2dUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuPooling2dInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateConvolution2d(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuConvolution2dFloat16Workload,
-                        NpuConvolution2dFloat32Workload,
-                        NpuConvolution2dUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuConvolution2dFloat16Workload,
+                                     NpuConvolution2dFloat32Workload,
+                                     NpuConvolution2dUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuConvolution2dInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateDepthwiseConvolution2d(
     const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuDepthWiseConvolution2dFloat16Workload,
-                        NpuDepthWiseConvolution2dFloat32Workload,
-                        NpuDepthWiseConvolution2dUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuDepthWiseConvolution2dFloat16Workload,
+                                     NpuDepthWiseConvolution2dFloat32Workload,
+                                     NpuDepthWiseConvolution2dUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuDepthWiseConvolution2dInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateDetectionPostProcess(
@@ -224,9 +246,12 @@ std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateNormalization(
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateAddition(
     const AdditionQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuAdditionFloat16Workload,
-                        NpuAdditionFloat32Workload,
-                        NpuAdditionUint8Workload>(descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuAdditionFloat16Workload,
+                                     NpuAdditionFloat32Workload,
+                                     NpuAdditionUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuAdditionInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMultiplication(
@@ -284,8 +309,12 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateL2Normalization(
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateConcat(
     const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuConcatFloat16Workload, NpuConcatFloat32Workload, NpuConcatUint8Workload>(
-        descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuConcatFloat16Workload,
+                                     NpuConcatFloat32Workload,
+                                     NpuConcatUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuConcatInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateConstant(
@@ -360,8 +389,12 @@ std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMaximum(
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMean(
     const MeanQueueDescriptor& descriptor, const WorkloadInfo& info) const {
-    return MakeWorkload<NpuMeanFloat16Workload, NpuMeanFloat32Workload, NpuMeanUint8Workload>(
-        descriptor, info);
+    return armnn::MakeWorkloadHelper<NpuMeanFloat16Workload,
+                                     NpuMeanFloat32Workload,
+                                     NpuMeanUint8Workload,
+                                     NullWorkload,
+                                     NullWorkload,
+                                     NpuMeanInt8Workload>(descriptor, info);
 }
 
 std::unique_ptr<armnn::IWorkload> NpuWorkloadFactory::CreateMinimum(
@@ -433,9 +466,58 @@ std::unique_ptr<IWorkload> NpuWorkloadFactory::CreatePreCompiled(const PreCompil
     return MakeWorkload<NullWorkload, NullWorkload, NullWorkload>(descriptor, info);
 }
 
+template <armnn::DataType input_type, armnn::DataType output_type, typename QueueDescriptorType, typename... Args>
+std::unique_ptr<IWorkload> MakeQuantizeWorkloadHelper(const QueueDescriptorType& descriptor,
+                                              const WorkloadInfo& info,
+                                              Args&&... args) {
+    return MakeWorkloadForType<NpuTensorCopyWorkload<
+        QuantizeQueueDescriptor, nnrt::OperationType::DATA_CONVERT,
+        input_type, output_type>>::Func(descriptor, info, std::forward<Args>(args)...);
+}
+
+template <typename QueueDescriptorType, typename... Args>
+std::unique_ptr<IWorkload> MakeQuantizeNullWorkloadHelper(const QueueDescriptorType& descriptor,
+                                              const WorkloadInfo& info,
+                                              Args&&... args) {
+    return MakeWorkloadForType<NullWorkload>::Func(descriptor, info, std::forward<Args>(args)...);
+}
+
+template <armnn::DataType input_type, armnn::DataType output_type>
+std::unique_ptr<IWorkload> MakeQuantizeWorkloadFactory(const QuantizeQueueDescriptor& descriptor,
+                                                              const WorkloadInfo& info) {
+    return MakeQuantizeWorkloadHelper<input_type, output_type>(descriptor, info);
+}
+
+struct QuantizeWorkloadItem {
+    DataType input_type;
+    DataType output_type;
+    std::unique_ptr<IWorkload> (*func)(const QuantizeQueueDescriptor& descriptor,
+                                       const WorkloadInfo& info);
+};
+
+#define CREATE_QUANTIZE_WORKLOAD_ITEM(input_type, output_type)                       \
+    {                                                                                \
+        DataType::input_type, DataType::output_type,                                 \
+            MakeQuantizeWorkloadFactory<DataType::input_type, DataType::output_type> \
+    }
+
+static const std::vector<QuantizeWorkloadItem> quantize_workload_table = {
+    CREATE_QUANTIZE_WORKLOAD_ITEM(Float32, QAsymmU8),
+    CREATE_QUANTIZE_WORKLOAD_ITEM(QAsymmU8, QAsymmS8),
+    CREATE_QUANTIZE_WORKLOAD_ITEM(QAsymmS8, QAsymmU8),
+    CREATE_QUANTIZE_WORKLOAD_ITEM(QAsymmS8, QAsymmS8),
+};
+
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateQuantize(const QuantizeQueueDescriptor& descriptor,
                                                               const WorkloadInfo& info) const {
-    return MakeWorkload<NullWorkload, NpuQuantizeFloat32Workload, NullWorkload>(descriptor, info);
+    auto input_type = info.m_InputTensorInfos[0].GetDataType();
+    auto output_type = info.m_OutputTensorInfos[0].GetDataType();
+    for (auto& item : quantize_workload_table) {
+        if (input_type == item.input_type && output_type == item.output_type) {
+            return item.func(descriptor, info);
+        }
+    }
+    return MakeQuantizeNullWorkloadHelper(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NpuWorkloadFactory::CreateDequantize(const DequantizeQueueDescriptor& descriptor,
