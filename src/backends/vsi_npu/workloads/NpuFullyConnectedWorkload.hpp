@@ -167,6 +167,6 @@ class NpuFullyConnectedFloatWorkload
 };
 using NpuFullyConnectedFloat32Workload = NpuFullyConnectedFloatWorkload<armnn::DataType::Float32>;
 using NpuFullyConnectedFloat16Workload = NpuFullyConnectedFloatWorkload<armnn::DataType::Float16>;
-using NpuFullyConnectedUint8Workload =
-    NpuFullyConnectedFloatWorkload<armnn::DataType::QAsymmU8>;
+using NpuFullyConnectedUint8Workload = NpuFullyConnectedFloatWorkload<armnn::DataType::QAsymmU8>;
+using NpuFullyConnectedInt8Workload = NpuFullyConnectedFloatWorkload<armnn::DataType::QAsymmS8>;
 }  // namespace armnn
