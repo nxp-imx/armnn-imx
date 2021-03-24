@@ -70,7 +70,7 @@ endif()
 # Compiler flags that are always set
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(COMPILER_IS_GNU_LIKE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion -Wno-deprecated-declarations -Wno-unused-parameter")
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	# Disable C4996 (use of deprecated identifier) due to https://developercommunity.visualstudio.com/content/problem/252574/deprecated-compilation-warning-for-virtual-overrid.html
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /wd4996")
@@ -124,6 +124,8 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
+set(CMAKE_FIND_ROOT_PATH "${CMAKE_FIND_ROOT_PATH};${ARMNN_ROOT};${BOOST_ROOT}")
+
 include(CMakeFindDependencyMacro)
 
 if (NOT BUILD_PIPE_ONLY)
@@ -137,9 +139,11 @@ if (NOT BUILD_PIPE_ONLY)
   endif()
   if (BUILD_UNIT_TESTS)
     add_definitions("-DBOOST_ALL_NO_LIB") # Turn off auto-linking as we specify the libs manually
-    find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework)
+    find_package(Boost 1.59 REQUIRED COMPONENTS unit_test_framework program_options)
     include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
     link_directories(${Boost_LIBRARY_DIRS})
+    message(STATUS "Boost headers are located at: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "Boost library are located at: ${Boost_LIBRARY_DIRS}")
   endif()
 endif()
 
@@ -217,16 +221,14 @@ endif()
 # Flatbuffers support for TF Lite and Armnn Serializer
 if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
     # verify we have a valid flatbuffers include path
-    find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
-              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
-
+    set(FLATBUFFERS_INCLUDE_PATH "${FLATBUFFERS_ROOT}/include")
     message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
 
     find_library(FLATBUFFERS_LIBRARY
                  NAMES libflatbuffers.a flatbuffers
                  HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
 
-    message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
+    message(STATUS "Flatbuffers library are located at: ${FLATBUFFERS_LIBRARY}")
 endif()
 
 # Flatbuffers schema support for TF Lite
@@ -307,6 +309,35 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
             debug ${ARMCOMPUTE_LIBRARY_DEBUG} ${ARMCOMPUTE_CORE_LIBRARY_DEBUG}
             optimized ${ARMCOMPUTE_LIBRARY_RELEASE} ${ARMCOMPUTE_CORE_LIBRARY_RELEASE} )
     endif()
+endif()
+
+# ARM Compute NPU backend
+if(VSI_NPU)
+    # Add preprocessor definition for ARM Compute NPU
+    add_definitions(-DARMCOMPUTENPU_ENABLED)
+    if(NOT DEFINED ENV{OVXLIB_DIR})
+        message(FATAL_ERROR "please set ENV: OVXLIB_DIR")
+    else()
+        set(OVXLIB_DIR $ENV{OVXLIB_DIR})
+        set(OVXLIB_LIB ${OVXLIB_DIR}/lib)
+    endif()
+
+    if(NOT DEFINED ENV{NNRT_ROOT})
+        message(FATAL_ERROR "please set ENV: NNRT_ROOT")
+    else()
+        set(NNRT_ROOT $ENV{NNRT_ROOT})
+        set(NNRT_LIB ${NNRT_ROOT}/nnrt/lib)
+    endif()
+
+    if(NOT DEFINED ENV{VIVANTE_SDK_DIR})
+        message(FATAL_ERROR "please set ENV: VIVANTE_SDK_DIR")
+    else()
+        set(VIVANTE_SDK_ROOT $ENV{VIVANTE_SDK_DIR})
+        set(VIVANTE_SDK_LIB $ENV{VIVANTE_SDK_DIR}/drivers)
+    endif()
+
+    link_libraries(-L${NNRT_LIB} -L${OVXLIB_LIB} -L${VIVANTE_SDK_LIB})
+    set(VSINPU_LIBRARIES ovxlib nnrt)
 endif()
 
 # ARM Compute NEON backend

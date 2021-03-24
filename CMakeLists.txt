@@ -52,6 +52,11 @@ if (BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+# include verisilicon modified models
+if (BUILD_VSI_TESTS)
+    add_subdirectory(tests/model)
+endif()
+
 # Include the additional cmake files in their own target so that they will appear nicely in IDEs
 add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 
@@ -643,6 +648,10 @@ install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
+endif()
+
+if(VSI_NPU)
+    target_link_libraries(armnn ${VSINPU_LIBRARIES})
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
