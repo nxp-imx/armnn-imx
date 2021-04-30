@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2020 Arm Ltd. All rights reserved.
-# Copyright © 2020 NXP and Contributors. All rights reserved.
+# Copyright © 2020-2021 NXP and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 """Python bindings for Arm NN
 
@@ -63,10 +63,11 @@ class ArmnnVersionCheckerExtBuilder(build_ext):
                 logger.warning('Failed to build extension %s. \n %s', ext.name, str(err))
         else:
             super().build_extension(ext)
-            if ext.name == 'pyarmnn._generated._pyarmnn_version':
-                sys.path.append(os.path.abspath(os.path.join(self.build_lib, str(Path(ext._file_name).parent))))
-                from _pyarmnn_version import GetVersion
-                check_armnn_version(GetVersion(), __arm_ml_version__)
+            # Removed due to cross-compilation, we cannot check version using a binary for a different platform            
+            # if ext.name == 'pyarmnn._generated._pyarmnn_version':
+                # sys.path.append(os.path.abspath(os.path.join(self.build_lib, str(Path(ext._file_name).parent))))
+                # from _pyarmnn_version import GetVersion
+                # check_armnn_version(GetVersion(), __arm_ml_version__)
 
     def copy_extensions_to_source(self):
 
@@ -74,25 +75,25 @@ class ArmnnVersionCheckerExtBuilder(build_ext):
             self.extensions.remove(ext)
         super().copy_extensions_to_source()
 
+# Disabled because it returns an unknown compiler name when cross-compiling on Yocto
+# def linux_gcc_name():
+    # """Returns the name of the `gcc` compiler. Might happen that we are cross-compiling and the
+    # compiler has a longer name.
 
-def linux_gcc_name():
-    """Returns the name of the `gcc` compiler. Might happen that we are cross-compiling and the
-    compiler has a longer name.
+    # Args:
+        # None
 
-    Args:
-        None
-
-    Returns:
-        str: Name of the `gcc` compiler or None
-    """
-    cc_env = os.getenv('CC')
-    if cc_env is not None:
-        if subprocess.Popen([cc_env, "--version"], stdout=subprocess.DEVNULL):
-            return cc_env
-    return "gcc" if subprocess.Popen(["gcc", "--version"], stdout=subprocess.DEVNULL) else None
+    # Returns:
+        # str: Name of the `gcc` compiler or None
+    # """
+    # cc_env = os.getenv('CC')
+    # if cc_env is not None:
+        # if subprocess.Popen([cc_env, "--version"], stdout=subprocess.DEVNULL):
+            # return cc_env
+    # return "gcc" if subprocess.Popen(["gcc", "--version"], stdout=subprocess.DEVNULL) else None
 
 
-def linux_gcc_lib_search(gcc_compiler_name: str = linux_gcc_name()):
+def linux_gcc_lib_search(gcc_compiler_name: str = None):
     """Calls the `gcc` to get linker default system paths.
 
     Args:
@@ -104,15 +105,17 @@ def linux_gcc_lib_search(gcc_compiler_name: str = linux_gcc_name()):
     Raises:
         RuntimeError: If unable to find GCC.
     """
-    if gcc_compiler_name is None:
-        raise RuntimeError("Unable to find gcc compiler")
-    cmd1 = subprocess.Popen([gcc_compiler_name, "--print-search-dirs"], stdout=subprocess.PIPE)
-    cmd2 = subprocess.Popen(["grep", "libraries"], stdin=cmd1.stdout,
-                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    cmd1.stdout.close()
-    out, _ = cmd2.communicate()
-    out = out.decode("utf-8").split('=')
-    return tuple(out[1].split(':')) if len(out) > 0 else None
+    # Disabled because it returns an unknown compiler name when cross-compiling on Yocto    
+    # if gcc_compiler_name is None:
+        # raise RuntimeError("Unable to find gcc compiler")
+    # cmd1 = subprocess.Popen([gcc_compiler_name, "--print-search-dirs"], stdout=subprocess.PIPE)
+    # cmd2 = subprocess.Popen(["grep", "libraries"], stdin=cmd1.stdout,
+                         # stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    # cmd1.stdout.close()
+    # out, _ = cmd2.communicate()
+    # out = out.decode("utf-8").split('=')
+    # return tuple(out[1].split(':')) if len(out) > 0 else None
+    return None
 
 
 def find_includes(armnn_include_env: str = INCLUDE_ENV_NAME):
@@ -187,10 +190,11 @@ class LazyArmnnFinderExtension(Extension):
         self._runtime_library_dirs = None
         self._armnn_libs = armnn_libs
         self._optional = False if optional is None else optional
-
+        # library_dirs and runtime_library_dirs are not passed, because they
+        # invoke -R argument which causes errors when cross-compiling using using ARM GCC
         super().__init__(name=name, sources=sources, include_dirs=include_dirs, define_macros=define_macros,
-                         undef_macros=undef_macros, library_dirs=library_dirs, libraries=libraries,
-                         runtime_library_dirs=runtime_library_dirs, extra_objects=extra_objects,
+                         undef_macros=undef_macros, library_dirs=None, libraries=libraries,
+                         runtime_library_dirs=None, extra_objects=extra_objects,
                          extra_compile_args=extra_compile_args, extra_link_args=extra_link_args,
                          export_symbols=export_symbols, language=language, optional=optional, **kw)
 
@@ -202,31 +206,32 @@ class LazyArmnnFinderExtension(Extension):
     def include_dirs(self, include_dirs):
         self._include_dirs = include_dirs
 
-    @property
-    def library_dirs(self):
-        library_dirs = self._library_dirs
-        for lib in self._armnn_libs:
-            _, lib_path = find_armnn(lib, self._optional)
-            library_dirs = library_dirs + lib_path
+    # These invoke -R argument which causes errors when cross-compiling using ARM GCC
+    # @property
+    # def library_dirs(self):
+        # library_dirs = self._library_dirs
+        # for lib in self._armnn_libs:
+            # _, lib_path = find_armnn(lib, self._optional)
+            # library_dirs = library_dirs + lib_path
 
-        return library_dirs
+        # return library_dirs
 
-    @library_dirs.setter
-    def library_dirs(self, library_dirs):
-        self._library_dirs = library_dirs
+    # @library_dirs.setter
+    # def library_dirs(self, library_dirs):
+        # self._library_dirs = library_dirs
 
-    @property
-    def runtime_library_dirs(self):
-        library_dirs = self._runtime_library_dirs
-        for lib in self._armnn_libs:
-            _, lib_path = find_armnn(lib, self._optional)
-            library_dirs = library_dirs + lib_path
+    # @property
+    # def runtime_library_dirs(self):
+        # library_dirs = self._runtime_library_dirs
+        # for lib in self._armnn_libs:
+            # _, lib_path = find_armnn(lib, self._optional)
+            # library_dirs = library_dirs + lib_path
 
-        return library_dirs
+        # return library_dirs
 
-    @runtime_library_dirs.setter
-    def runtime_library_dirs(self, runtime_library_dirs):
-        self._runtime_library_dirs = runtime_library_dirs
+    # @runtime_library_dirs.setter
+    # def runtime_library_dirs(self, runtime_library_dirs):
+        # self._runtime_library_dirs = runtime_library_dirs
 
     @property
     def libraries(self):
