@@ -66,7 +66,7 @@ target_link_libraries(armnnDelegate PUBLIC Armnn::Armnn)
 ## Add TfLite v2.3.1 dependency
 find_package(TfLite REQUIRED MODULE)
 
-target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB})
+target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB} dl rt)
 
 # Various tflite header files are not warning clean
 # We can't change compilation flags on header files directly, so we need to add them to an interface library first
