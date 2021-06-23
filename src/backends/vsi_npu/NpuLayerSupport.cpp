@@ -663,7 +663,7 @@ bool NpuLayerSupport::IsDepthwiseConvolutionSupported(
 bool NpuLayerSupport::IsDequantizeSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             Optional<std::string&> reasonIfUnsupported) const {
-    bool supported = false;
+    bool supported = true;
 
     std::array<DataType, 1> supportedInputTypes = {DataType::QAsymmU8,
         //DataType::QSymmS16
@@ -1330,7 +1330,7 @@ bool NpuLayerSupport::IsPooling2dSupported(const TensorInfo& input,
 bool NpuLayerSupport::IsQuantizeSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const {
-    bool supported = false;
+    bool supported = true;
 
     // Define supported output types.
     std::array<DataType, 3> supportedInputTypes = {
