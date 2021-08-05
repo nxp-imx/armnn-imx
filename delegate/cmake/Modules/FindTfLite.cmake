@@ -18,6 +18,7 @@ find_library(TfLite_LIB
         NAMES
             "libtensorflow_lite_all.so"
             "libtensorflowlite.so"
+            "libtensorflow-lite.so"
             "libtensorflow-lite.a"
         HINTS
             ${TFLITE_LIB_DIR} # path to prebuilt TF Lite library

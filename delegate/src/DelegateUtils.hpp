@@ -294,7 +294,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
             activationDesc.m_Function = armnn::ActivationFunction::ReLu;
             break;
         }
-        case kTfLiteActRelu1:
+        case kTfLiteActReluN1To1:
         {
             activationDesc.m_Function = armnn::ActivationFunction::BoundedReLu;
             activationDesc.m_A = 1.0f;
