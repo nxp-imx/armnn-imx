@@ -18,6 +18,7 @@ find_library(TfLite_LIB
         NAMES
             "libtensorflow_lite_all.so"
             "libtensorflowlite.so"
+            "libtensorflow-lite.so"
             "libtensorflow-lite.a"
         HINTS
             ${TFLITE_LIB_DIR} # path to prebuilt TF Lite library
@@ -41,4 +42,19 @@ if(TFLITE_FOUND)
     message(STATUS "TfLite_LIB: ${TfLite_LIB}")
     message(STATUS "TfLite_INCLUDE_DIR: ${TfLite_INCLUDE_DIR}")
     message(STATUS "TfLite_Schema_INCLUDE_PATH: ${TfLite_Schema_INCLUDE_PATH}")
+endif()
+
+## TIM-VX is a VSI-proprietary lib used by TF Lite in ovxlib delegate if available
+find_library(TimVX_LIB
+    NAMES
+        "libtim-vx.so"
+        "libtim-vx-static.a"
+    HINTS
+        ${TIMVX_LIB_DIR})
+
+if (TimVX_LIB)
+    set(TIMVX_LIB ${TimVX_LIB})
+    message(STATUS "TimVX_LIB: ${TimVX_LIB}")
+else()
+    message(STATUS "TimVX_LIB not found.")
 endif()
