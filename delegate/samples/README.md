@@ -2,13 +2,13 @@
 
 The following example demonstrates a sample project using a TF Lite Interpreter delegating workloads to the Arm NN framework.
 
-1) Activate the Yocto SDK environment on your host machine for cross-compiling (make sure that TensorFlow Lite and Arm NN are installed):
-source <yocto_sdk_install_dir>/environment-setup-aarch64-poky-linux
+1) Activate the Yocto SDK environment on your host machine for cross-compiling (make sure that tensorflow-lite-dev and armnn-dev packages are installed in the SDK, they should be there by default when building the SDK), e.g.:
+source <yocto_sdk_install_dir>/environment-setup-cortexa53-crypto-poky-linux
 
-2) Download code from: https://source.codeaurora.org/external/imx/armnn-imx/tree/delegate/samples?h=lf-5.10.52-2.1.0 and cross-compile using:
+2) Source code should be available in the aarch64 sysroot directory, e.g. <yocto_sdk_install_dir>/sysroots/cortexa53-crypto-poky-linux/usr/bin/armnn-21.02/delegate. Cross-compile using:
 $CXX -o armnn_delegate_example armnn_delegate_example.cpp -larmnn -larmnnDelegate -ltensorflow-lite
 
-3) Copy armnn_delegate_example to your board and execute, the output should look similar to the following:
+3) Copy armnn_delegate_example to your board and run it, the output should look similar to the following:
 
 ```
 root@imx8mpevk:~# ./armnn_delegate_example
@@ -18,7 +18,7 @@ Inference time: 2.809 ms
 TOP 1: 412
 ```
 
-Now let's have a look at the code available for the previous example.
+Now let's have a look at the code in armnn_delegate_example.cpp:
 
 1) First we need to load a model, create the TF Lite Interpreter, and allocate input tensors of the appropriate size. You may use a different tflite model from the one supplied below for your own project:
 
@@ -54,7 +54,7 @@ std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDele
                                      armnnDelegate::TfLiteArmnnDelegateDelete);
 ```
 
-4) Now we must apply the delegate to the graph. This partitions the graph into subgraphs which will be executed using the Arm NN delegate if possible. The rest will fall back to the CPU:
+4) Now we must apply the delegate to the graph. This partitions the graph into subgraphs which will be executed using the Arm NN delegate if possible. The rest will fall back to TF Lite built-in kernels for the CPU:
 ```cpp
 if (interpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) != kTfLiteOk)
 {
