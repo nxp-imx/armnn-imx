@@ -26,7 +26,7 @@
 #include <layers/ConvertFp32ToFp16Layer.hpp>
 #include <test/TensorHelpers.hpp>
 
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>
 

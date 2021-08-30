@@ -24,7 +24,7 @@
 
 #include <test/CreateWorkload.hpp>
 #include <NpuWorkloadFactory.hpp>
-#include <backendsCommon/CpuTensorHandle.hpp>
+#include <backendsCommon/TensorHandle.hpp>
 
 #include "workloads/NpuActivationWorkload.hpp"
 #include "workloads/NpuBatchNormalizationWorkload.hpp"
