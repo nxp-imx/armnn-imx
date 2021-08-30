@@ -556,6 +556,10 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
     target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
 endif()
 
+if(VSI_NPU)
+    target_link_libraries(armnn ${VSI_NPU_LIBRARIES})
+endif()
+
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
     target_link_libraries(armnn ${CMAKE_THREAD_LIBS_INIT})
 endif()
