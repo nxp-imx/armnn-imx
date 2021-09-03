@@ -1,5 +1,6 @@
 #
 # Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright 2020-2021 NXP
 # SPDX-License-Identifier: MIT
 #
 
@@ -27,3 +28,9 @@ foreach(dynamicBackendDir ${dynamicBackendDirs})
         add_subdirectory(${dynamicBackendDir})
     endif()
 endforeach()
+
+# add VSI NPU dynamic backend
+SET(vsiNpuDynamicBackendPath "${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/dynamic")
+if (EXISTS ${vsiNpuDynamicBackendPath} AND IS_DIRECTORY ${vsiNpuDynamicBackendPath})
+    add_subdirectory(${vsiNpuDynamicBackendPath})
+endif()
