@@ -45,3 +45,5 @@ target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
 target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/dynamic)
+target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
+target_include_directories(armnnNpuBackendUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/third-party/doctest)

@@ -28,7 +28,6 @@
 #include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadData.hpp>
-#include <iostream>
 #include "TNpuWorkloads.hpp"
 
 namespace armnn {

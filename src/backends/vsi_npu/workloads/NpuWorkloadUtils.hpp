@@ -30,8 +30,6 @@
 #include <armnn/Types.hpp>
 #include <Half.hpp>
 
-#include <boost/polymorphic_cast.hpp>
-
 namespace armnn
 {
 
