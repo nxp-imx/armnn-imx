@@ -56,10 +56,4 @@ target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/pro
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu)
-target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
-
-add_subdirectory(workloads)
-
-if(BUILD_UNIT_TESTS)
-    add_subdirectory(test)
-endif()
+target_include_directories(armnnNpuBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends/vsi_npu/workloads)
