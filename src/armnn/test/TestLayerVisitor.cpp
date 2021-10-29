@@ -49,10 +49,6 @@ void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const Cons
     }
 }
 
-        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
-        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
-        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
-        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
 void TestLayerVisitor::CheckOptionalConstTensors(const Optional<ConstTensor>& expected,
                                                  const Optional<ConstTensor>& actual)
 {
